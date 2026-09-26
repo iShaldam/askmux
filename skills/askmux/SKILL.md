@@ -17,10 +17,10 @@ question tool; never invent a tool name.
 
 | Harness | Tool | Where it works |
 |---|---|---|
-| Claude Code | `AskUserQuestion` | interactive sessions; not in `claude -p` |
-| Cursor | `AskQuestion` | model-gated: missing on some models (Grok 4.5, and Auto when it routes there) |
-| Antigravity | `ask_question` | interactive, and listed in `agy -p` |
-| Codex | `request_user_input` | Plan mode only |
+| Claude Code | `AskUserQuestion` | interactive, and the Agent SDK; not in `claude -p` |
+| Cursor | `AskQuestion` | model-gated: Composer 2.5 has it, Grok 4.5 and Auto didn't; headless skips the answer |
+| Antigravity | `ask_question` | interactive; listed in `agy -p`, but headless picks for you |
+| Codex | `request_user_input` | Plan mode in the TUI only; not in `codex exec` |
 | Copilot CLI | `ask_user` | interactive; not in `copilot -p` |
 | Grok CLI | `ask_user_question` | interactive and `grok -p` |
 
