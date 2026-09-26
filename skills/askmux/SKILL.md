@@ -28,7 +28,9 @@ question tool; never invent a tool name.
 
 ## If the tool is missing
 
-1. Check your tool list once. If it isn't there, don't pretend it is.
+1. Check your tool list once. If your harness defers tools behind a tool
+   search, search the name before deciding it's missing. If it isn't there,
+   don't pretend it is.
 2. Headless run (no one watching)? Don't ask. Take the recommended option,
    say so in one line, and keep going.
 3. Otherwise say in one line what's missing and how to get it (Codex: switch
