@@ -14,7 +14,7 @@ called() {  # a pattern only a real call event matches
   case "$1" in
     claude)  echo '"name":"AskUserQuestion"' ;;
     cursor)  echo '"askQuestionToolCall":' ;;
-    agy)     echo '"(name|tool_name|step_type)":"ask_question"' ;;
+    agy)     echo '"tool_name":"ask_question"' ;;
     copilot) echo '"(name|toolName)":"ask_user"' ;;
     grok)    echo '"toolName":"ask_user_question"' ;;
     codex)   echo '"method":"item/tool/requestUserInput"' ;;  # app-server only; exec never offers it

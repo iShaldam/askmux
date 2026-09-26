@@ -10,11 +10,12 @@ PROBE = os.path.join(ROOT, "scripts", "probe.sh")
 ECHO = '{"type":"user","text":"...built-in tool for asking the user a question... reply exactly NO_ASK_TOOL."}\n'
 
 # one call event per harness. grok's and cursor's are trimmed from real runs;
+# agy's is the shape its other tools log with (it leaves this one unlabelled);
 # the rest follow each harness's documented event shape until a probe catches one
 CALLS = {
     "claude": '{"type":"tool_use","name":"AskUserQuestion","input":{}}',
     "cursor": '{"type":"tool_call","subtype":"started","tool_call":{"askQuestionToolCall":{"args":{"title":"Pick a color"}}}}',
-    "agy": '{"event":"step_update","step_update":{"step_type":"ask_question"}}',
+    "agy": '{"event":"step_update","step_update":{"step_type":"tool","tool_name":"ask_question"}}',
     "copilot": '{"type":"tool.execution_start","data":{"toolName":"ask_user"}}',
     "grok": '{"type":"tool_call","title":"ask_user_question","toolName":"ask_user_question"}',
     # unverified: codex exec never offers the tool; only app-server sends this
