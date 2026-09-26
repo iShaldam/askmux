@@ -24,7 +24,7 @@ question tool; never invent a tool name.
 | Copilot CLI | `ask_user` | interactive; not in `copilot -p` |
 | Grok CLI | `ask_user_question` | interactive and `grok -p` |
 
-`MATRIX.md` in this repo has the tested detail per mode and model.
+[MATRIX.md](https://github.com/iShaldam/askmux/blob/main/MATRIX.md) has the tested detail per mode and model.
 
 ## If the tool is missing
 
