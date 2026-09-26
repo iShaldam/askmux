@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import shutil
@@ -75,6 +76,21 @@ class Classify(unittest.TestCase):
     def test_other_harness_call_does_not_count(self):
         self.assertEqual(classify("claude", CALLS["grok"] + "\n"), 3)
 
+    def test_tool_definition_object_is_not_called(self):
+        # copilot lists its tools as objects with a "name" key
+        log = ECHO + '{"type":"session.tools_updated","data":{"tools":[{"name":"ask_user"}]}}\n'
+        self.assertEqual(classify("copilot", log), 3)
+
+    def test_unknown_harness_is_2(self):
+        # an empty pattern would match anything
+        self.assertEqual(classify("nope", ECHO + CALLS["grok"] + "\n"), 2)
+        self.assertEqual(classify("agy-listdir", ""), 2)
+
+    def test_spaced_json_still_counts(self):
+        for h, line in CALLS.items():
+            spaced = line.replace('":"', '": "').replace('":{', '": {')
+            self.assertEqual(classify(h, ECHO + spaced + "\n"), 0, h)
+
 
 def fake_run(tmp, cli, body, *args, **env):
     # run the probe from a copy of scripts/ with a stand-in cli first on PATH
@@ -111,7 +127,31 @@ class Run(unittest.TestCase):
             r = fake_run(tmp, "cursor-agent", body, "cursor", "--model", "composer-2.5",
                          HOME=os.path.join(tmp, "home"))
             self.assertEqual(r.returncode, 0, r.stdout)
-            self.assertEqual(read_abs(cfg), '{"model":{"modelId":"grok-4.5"}}\n')
+            self.assertEqual(json.loads(read_abs(cfg)), {"model": {"modelId": "grok-4.5"}})
+
+    def test_cursor_restore_keeps_other_settings(self):
+        # the config also holds auth and permissions; a run may change those and they must stay
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = os.path.join(tmp, "home", ".cursor", "cli-config.json")
+            os.makedirs(os.path.dirname(cfg))
+            with open(cfg, "w") as f:
+                json.dump({"model": {"modelId": "grok-4.5"}, "permissions": {"allow": []}}, f)
+            new = {"model": {"modelId": "composer-2.5"}, "selectedModel": "composer-2.5",
+                   "permissions": {"allow": ["Shell(ls)"]}}
+            body = (f"echo '{json.dumps(new)}' > \"$HOME/.cursor/cli-config.json\"\n"
+                    f"echo '{CALLS['cursor']}'\n")
+            r = fake_run(tmp, "cursor-agent", body, "cursor", HOME=os.path.join(tmp, "home"))
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            self.assertEqual(json.loads(read_abs(cfg)),
+                             {"model": {"modelId": "grok-4.5"}, "permissions": {"allow": ["Shell(ls)"]}})
+
+    def test_cursor_probe_refuses_to_overlap(self):
+        # two overlapping probes would restore each other's model
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, "home", ".cursor", "askmux-probe.lock"))
+            r = fake_run(tmp, "cursor-agent", "echo x\n", "cursor", HOME=os.path.join(tmp, "home"))
+            self.assertEqual(r.returncode, 2, r.stdout)
+            self.assertIn("another cursor probe", r.stdout)
 
 
 class Docs(unittest.TestCase):
