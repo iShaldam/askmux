@@ -9,15 +9,25 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROBE = os.path.join(ROOT, "scripts", "probe.sh")
 ECHO = '{"type":"user","text":"...built-in tool for asking the user a question... reply exactly NO_ASK_TOOL."}\n'
 
-# one call event per harness. grok's is trimmed from a real run; the rest
-# follow each harness's documented event shape until a probe catches one
+# one call event per harness. grok's and cursor's are trimmed from real runs;
+# the rest follow each harness's documented event shape until a probe catches one
 CALLS = {
     "claude": '{"type":"tool_use","name":"AskUserQuestion","input":{}}',
-    "cursor": '{"type":"tool_call","tool_call":{"askQuestionToolCall":{}}}',
+    "cursor": '{"type":"tool_call","subtype":"started","tool_call":{"askQuestionToolCall":{"args":{"title":"Pick a color"}}}}',
     "agy": '{"event":"step_update","step_update":{"step_type":"ask_question"}}',
     "copilot": '{"type":"tool.execution_start","data":{"toolName":"ask_user"}}',
     "grok": '{"type":"tool_call","title":"ask_user_question","toolName":"ask_user_question"}',
-    "codex": '{"type":"item.started","item":{"type":"function_call","name":"request_user_input"}}',
+    # unverified: codex exec never offers the tool; only app-server sends this
+    "codex": '{"jsonrpc":"2.0","id":0,"method":"item/tool/requestUserInput","params":{}}',
+}
+# the name each model sees, as the skill's table lists it
+TOOLS = {
+    "claude": "AskUserQuestion",
+    "cursor": "AskQuestion",
+    "agy": "ask_question",
+    "copilot": "ask_user",
+    "grok": "ask_user_question",
+    "codex": "request_user_input",
 }
 
 
@@ -52,6 +62,13 @@ class Classify(unittest.TestCase):
         # a tool list naming the tool is not a call
         log = ECHO + '{"init":{"tools":["AskUserQuestion","ask_question","ask_user"]}}\n'
         for h in ("claude", "agy", "copilot"):
+            self.assertEqual(classify(h, log), 3, h)
+
+    def test_mention_is_not_called(self):
+        # cursor's thinking said "No AskQuestion tool" and the old regex took it as a call
+        for h, tool in TOOLS.items():
+            log = (ECHO + f'{{"type":"thinking","subtype":"delta","text":"No {tool} tool"}}\n'
+                   f'{{"type":"assistant","text":"I would call {tool} but"}}\n')
             self.assertEqual(classify(h, log), 3, h)
 
     def test_other_harness_call_does_not_count(self):
@@ -106,7 +123,7 @@ class Docs(unittest.TestCase):
 
     def test_every_skill_tool_is_in_the_matrix(self):
         tools = set(re.findall(r"^\| [^|]+\| `(\w+)`", read("skills/askmux/SKILL.md"), re.M))
-        self.assertTrue(tools)
+        self.assertEqual(tools, set(TOOLS.values()))
         matrix = read("MATRIX.md")
         for t in tools:
             self.assertIn(f"`{t}`", matrix, t)

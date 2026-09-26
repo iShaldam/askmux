@@ -23,4 +23,7 @@ plant "inconclusive as no tool"   's/^  return 3$/  return 1/'
 plant "claude matches tool list"  's/"name":"AskUserQuestion"/AskUserQuestion/'
 plant "harness dropped"           '/^    codex)   echo/d'
 plant "cursor config not restored" 's/ && cp "$snap" "$cfg"//'
+plant "cursor matches thinking"   's/"askQuestionToolCall":/[Aa]sk[Qq]uestion/'
+plant "codex matches prose"       's|"method":"item/tool/requestUserInput"|request_user_input|'
+plant "summary dumps the log"     's/local log; log=/log=/'
 exit $missed

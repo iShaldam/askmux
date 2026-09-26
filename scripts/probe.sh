@@ -13,11 +13,11 @@ PROMPT='Ask me one multiple-choice question using your built-in tool for asking 
 called() {  # a pattern only a real call event matches
   case "$1" in
     claude)  echo '"name":"AskUserQuestion"' ;;
-    cursor)  echo '[Aa]sk[Qq]uestion' ;;
+    cursor)  echo '"askQuestionToolCall":' ;;
     agy)     echo '"(name|tool_name|step_type)":"ask_question"' ;;
     copilot) echo '"(name|toolName)":"ask_user"' ;;
     grok)    echo '"toolName":"ask_user_question"' ;;
-    codex)   echo 'request_user_input' ;;
+    codex)   echo '"method":"item/tool/requestUserInput"' ;;  # app-server only; exec never offers it
     *) return 1 ;;
   esac
 }
