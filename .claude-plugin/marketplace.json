@@ -1,0 +1,16 @@
+{
+  "name": "askmux",
+  "owner": {
+    "name": "iShaldam"
+  },
+  "metadata": {
+    "description": "askmux: one ask-the-user skill for every harness, and a tested matrix of which tool works where"
+  },
+  "plugins": [
+    {
+      "name": "askmux",
+      "source": "./",
+      "description": "Ask multiple-choice questions through whichever native question tool your harness has, with a fallback when it has none"
+    }
+  ]
+}

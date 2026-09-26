@@ -1,0 +1,8 @@
+{
+  "name": "askmux",
+  "version": "0.1.0",
+  "description": "Ask multiple-choice questions through whichever native question tool your harness has, with a fallback when it has none",
+  "author": { "name": "iShaldam" },
+  "license": "MIT",
+  "keywords": ["questions", "skill", "harness", "cursor", "codex", "askuserquestion"]
+}
