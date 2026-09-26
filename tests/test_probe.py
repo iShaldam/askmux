@@ -58,24 +58,42 @@ class Classify(unittest.TestCase):
         self.assertEqual(classify("claude", CALLS["grok"] + "\n"), 3)
 
 
+def fake_run(tmp, cli, body, *args, **env):
+    # run the probe from a copy of scripts/ with a stand-in cli first on PATH
+    shutil.copytree(os.path.join(ROOT, "scripts"), os.path.join(tmp, "scripts"))
+    os.mkdir(os.path.join(tmp, "bin"))
+    fake = os.path.join(tmp, "bin", cli)
+    with open(fake, "w") as f:
+        f.write("#!/bin/sh\n" + body)
+    os.chmod(fake, 0o755)
+    env = dict(os.environ, PATH=os.path.join(tmp, "bin") + os.pathsep + os.environ["PATH"], **env)
+    return subprocess.run(["bash", os.path.join(tmp, "scripts", "probe.sh"), *args],
+                          env=env, text=True, capture_output=True)
+
+
 class Run(unittest.TestCase):
     def test_fake_harness_run(self):
-        # a stand-in grok cli on PATH; the probe runs it and logs under runs/
         with tempfile.TemporaryDirectory() as tmp:
-            shutil.copytree(os.path.join(ROOT, "scripts"), os.path.join(tmp, "scripts"))
-            os.mkdir(os.path.join(tmp, "bin"))
-            fake = os.path.join(tmp, "bin", "grok")
-            with open(fake, "w") as f:
-                f.write(f"#!/bin/sh\necho '{CALLS['grok']}'\n")
-            os.chmod(fake, 0o755)
-            env = dict(os.environ, PATH=os.path.join(tmp, "bin") + os.pathsep + os.environ["PATH"])
-            r = subprocess.run(["bash", os.path.join(tmp, "scripts", "probe.sh"), "grok"],
-                               env=env, text=True, capture_output=True)
+            r = fake_run(tmp, "grok", f"echo '{CALLS['grok']}'\n", "grok")
             self.assertEqual(r.returncode, 0, r.stdout)
             # the summary names the log file, it doesn't dump it
             self.assertRegex(r.stdout, r"^probe: grok\s+-> 0 \(log: runs/[\w-]+-grok\.jsonl\)\n$")
             (log,) = os.listdir(os.path.join(tmp, "runs"))
             self.assertIn("ask_user_question", read_abs(os.path.join(tmp, "runs", log)))
+
+    def test_cursor_default_model_survives(self):
+        # cursor-agent --model saves that model as the user's default
+        with tempfile.TemporaryDirectory() as tmp:
+            cfg = os.path.join(tmp, "home", ".cursor", "cli-config.json")
+            os.makedirs(os.path.dirname(cfg))
+            with open(cfg, "w") as f:
+                f.write('{"model":{"modelId":"grok-4.5"}}\n')
+            body = ("echo '{\"model\":{\"modelId\":\"composer-2.5\"}}' > \"$HOME/.cursor/cli-config.json\"\n"
+                    f"echo '{CALLS['cursor']}'\n")
+            r = fake_run(tmp, "cursor-agent", body, "cursor", "--model", "composer-2.5",
+                         HOME=os.path.join(tmp, "home"))
+            self.assertEqual(r.returncode, 0, r.stdout)
+            self.assertEqual(read_abs(cfg), '{"model":{"modelId":"grok-4.5"}}\n')
 
 
 class Docs(unittest.TestCase):

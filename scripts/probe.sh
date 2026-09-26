@@ -35,6 +35,10 @@ if [ "${1:-}" = --classify ]; then classify "${2:?harness}"; exit; fi
 h="${1:?usage: probe.sh <harness> [extra cli args]}"; shift
 called "$h" >/dev/null || { echo "probe: unknown harness '$h'"; exit 2; }
 w="$(mktemp -d)"   # run outside the repo so an agent can't touch it
+# cursor-agent --model saves that model as your default; put yours back after
+snap="$(mktemp)"; cfg="$HOME/.cursor/cli-config.json"
+[ "$h" = cursor ] && cp "$cfg" "$snap" 2>/dev/null
+trap '[ -s "$snap" ] && cp "$snap" "$cfg"; rm -rf "$w" "$snap"' EXIT
 case "$h" in
   claude)  cmd=(claude -p "$PROMPT" --output-format stream-json --verbose) ;;
   cursor)  cmd=(cursor-agent -p "$PROMPT" --output-format stream-json --trust --workspace "$w") ;;
@@ -48,7 +52,6 @@ mkdir -p "$root/runs"
 log="$root/runs/$(date +%Y%m%d-%H%M%S)-$h.jsonl"
 (cd "$w" && timeout "${PROBE_TIMEOUT:-150}" "${cmd[@]}" "$@") > "$log" 2>&1
 rc=$?
-rm -rf "$w"
 [ $rc = 124 ] || { classify "$h" < "$log"; rc=$?; }
 echo "probe: $h $* -> $rc (log: ${log#"$root"/})"
 exit $rc

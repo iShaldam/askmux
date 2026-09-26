@@ -22,4 +22,5 @@ plant "echoed prompt counts"      "s/grep -v 'built-in tool for asking'/grep -v 
 plant "inconclusive as no tool"   's/^  return 3$/  return 1/'
 plant "claude matches tool list"  's/"name":"AskUserQuestion"/AskUserQuestion/'
 plant "harness dropped"           '/^    codex)   echo/d'
+plant "cursor config not restored" 's/ && cp "$snap" "$cfg"//'
 exit $missed
