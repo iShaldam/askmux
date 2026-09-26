@@ -38,6 +38,12 @@ fi
 
 h="${1:?usage: probe.sh <harness> [extra cli args]}"; shift
 called "$h" >/dev/null || { echo "probe: unknown harness '$h'"; exit 2; }
+# two overlapping cursor probes would each put back the other's model
+lock="$HOME/.cursor/askmux-probe.lock"
+if [ "$h" = cursor ]; then
+  mkdir -p "$HOME/.cursor"
+  mkdir "$lock" 2>/dev/null || { echo "probe: another cursor probe is running (stale? rmdir $lock)"; exit 2; }
+fi
 w="$(mktemp -d)"   # run outside the repo so an agent can't touch it
 # cursor-agent --model saves that model as your default; put yours back after.
 # only the model keys: auth and permissions in the same file may change mid-run
@@ -57,7 +63,7 @@ for k in ("model", "selectedModel", "modelParameters", "hasChangedDefaultModel",
 with open(cfg, "w") as f: json.dump(new, f, indent=2)
 PY
 }
-trap 'restore; rm -rf "$w" "$snap"' EXIT
+trap 'restore; rm -rf "$w" "$snap"; [ "$h" = cursor ] && rmdir "$lock"' EXIT
 case "$h" in
   claude)  cmd=(claude -p "$PROMPT" --output-format stream-json --verbose) ;;
   cursor)  cmd=(cursor-agent -p "$PROMPT" --output-format stream-json --trust --workspace "$w") ;;
