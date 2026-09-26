@@ -28,8 +28,9 @@ know. Evidence:
 | `grok` | `ask_user_question` | `grok -p` | grok-4.7 | called | probe exit 0, 2026-09-25 |
 | `grok` | `ask_user_question` | interactive | — | offered; in `-p` an unanswered question returns a "no operator" result | reported, [source](https://github.com/xai-org/grok-build/blob/f0e3be1100ef5252488e3be8bb0e91cf68d8c305/crates/codegen/xai-grok-tools/src/implementations/grok_build/ask_user_question/mod.rs#L101-L105) |
 | `codex` | `request_user_input` | `codex exec` | — | not offered; exec rejects the request as "not supported in exec mode" | reported, [source](https://github.com/openai/codex/blob/25270df2615eb4da5b9d4a9a392226933fb096c5/codex-rs/exec/src/lib.rs#L2038-L2048) |
-| `codex` | `request_user_input` | TUI, Plan mode | — | offered; Default mode says it's unavailable | reported, [openai/codex#29104](https://github.com/openai/codex/issues/29104), [#11536](https://github.com/openai/codex/issues/11536) |
+| `codex` | `request_user_input` | TUI, Plan mode | — | offered; Default mode says it's unavailable unless `[features] default_mode_request_user_input = true` (under development, off by default) | reported, [openai/codex#29104](https://github.com/openai/codex/issues/29104), [#11536](https://github.com/openai/codex/issues/11536), [flag](https://github.com/openai/codex/blob/0fbf0bedc25d0effec4b758030772468339d315c/codex-rs/features/src/lib.rs#L1613-L1618) |
 | `codex` | `request_user_input` | `codex app-server` | — | sent as the JSON-RPC request `item/tool/requestUserInput` (experimental) | reported, [source](https://github.com/openai/codex/blob/25270df2615eb4da5b9d4a9a392226933fb096c5/codex-rs/app-server-protocol/src/protocol/common.rs#L1777-L1781) |
+| `codex` | `request_user_input_async` | Default mode, models whose catalog lists it | offered to the main agent, not subagents | reported, [source](https://github.com/openai/codex/blob/0fbf0bedc25d0effec4b758030772468339d315c/codex-rs/core/src/tools/spec_plan.rs#L1178-L1193) |
 
 ## notes
 

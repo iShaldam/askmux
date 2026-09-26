@@ -20,7 +20,7 @@ question tool; never invent a tool name.
 | Claude Code | `AskUserQuestion` | interactive, and the Agent SDK; not in `claude -p` |
 | Cursor | `AskQuestion` | model-gated: Composer 2.5 has it, Grok 4.5 and Auto didn't; headless skips the answer |
 | Antigravity | `ask_question` | interactive; listed in `agy -p`, but headless picks for you |
-| Codex | `request_user_input` | Plan mode in the TUI only; not in `codex exec` |
+| Codex | `request_user_input` | Plan mode in the TUI (Default mode too with the `default_mode_request_user_input` feature); not in `codex exec`. Some models get `request_user_input_async` instead |
 | Copilot CLI | `ask_user` | interactive; not in `copilot -p` |
 | Grok CLI | `ask_user_question` | interactive and `grok -p` |
 
