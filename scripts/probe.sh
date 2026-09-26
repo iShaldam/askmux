@@ -23,7 +23,8 @@ called() {  # a pattern only a real call event matches
 }
 
 classify() {
-  local log; log="$(cat)"
+  # squeeze '"key" : ' to '"key":' so pretty-printed json matches too
+  local log; log="$(sed -E 's/"[[:space:]]*:[[:space:]]*/":/g')"
   grep -qE "$(called "$1")" <<<"$log" && return 0
   # some harnesses echo the prompt back; its NO_ASK_TOOL doesn't count
   grep -v 'built-in tool for asking' <<<"$log" | grep -q NO_ASK_TOOL && return 1
