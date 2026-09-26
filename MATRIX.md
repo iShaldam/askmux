@@ -10,7 +10,7 @@ know. Evidence:
 
 | harness | tool | surface / mode | model | result | evidence |
 |---|---|---|---|---|---|
-| `claude` | `AskUserQuestion` | desktop app, interactive | — | works | manual, 2026-09-25 |
+| `claude` | `AskUserQuestion` | desktop app, interactive | claude-opus-5-5 | works | manual, 2026-09-25 |
 | `claude` | `AskUserQuestion` | `claude -p` | claude-sonnet-5 | not offered: tool search finds nothing, replies NO_ASK_TOOL | probe exit 1, 2026-09-25 |
 | `claude` | `AskUserQuestion` | `claude -p --permission-mode plan` | claude-sonnet-5 | not offered | probe exit 1, 2026-09-25 |
 | `claude` | `AskUserQuestion` | Agent SDK, with a permission handler attached | — | offered; plain `-p` hides it since 2.1.187 | reported, [anthropics/claude-code#77994](https://github.com/anthropics/claude-code/issues/77994) |
