@@ -30,7 +30,10 @@ classify() {
   return 3
 }
 
-if [ "${1:-}" = --classify ]; then classify "${2:?harness}"; exit; fi
+if [ "${1:-}" = --classify ]; then
+  called "${2:?harness}" >/dev/null || exit 2  # no pattern would match anything
+  classify "$2"; exit
+fi
 
 h="${1:?usage: probe.sh <harness> [extra cli args]}"; shift
 called "$h" >/dev/null || { echo "probe: unknown harness '$h'"; exit 2; }
