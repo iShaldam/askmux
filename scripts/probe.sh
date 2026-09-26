@@ -39,10 +39,25 @@ fi
 h="${1:?usage: probe.sh <harness> [extra cli args]}"; shift
 called "$h" >/dev/null || { echo "probe: unknown harness '$h'"; exit 2; }
 w="$(mktemp -d)"   # run outside the repo so an agent can't touch it
-# cursor-agent --model saves that model as your default; put yours back after
+# cursor-agent --model saves that model as your default; put yours back after.
+# only the model keys: auth and permissions in the same file may change mid-run
 snap="$(mktemp)"; cfg="$HOME/.cursor/cli-config.json"
 [ "$h" = cursor ] && cp "$cfg" "$snap" 2>/dev/null
-trap '[ -s "$snap" ] && cp "$snap" "$cfg"; rm -rf "$w" "$snap"' EXIT
+restore() {
+  [ "$h" = cursor ] && [ -f "$cfg" ] || return 0
+  python3 - "$snap" "$cfg" <<'PY' || echo "probe: couldn't put the model back in $cfg"
+import json, os, sys
+snap, cfg = sys.argv[1:]
+old = json.load(open(snap)) if os.path.getsize(snap) else {}  # empty: no config before
+new = json.load(open(cfg))
+for k in ("model", "selectedModel", "modelParameters", "hasChangedDefaultModel",
+          "modelSelectionHistory", "maxMode"):
+    if k in old: new[k] = old[k]
+    else: new.pop(k, None)
+with open(cfg, "w") as f: json.dump(new, f, indent=2)
+PY
+}
+trap 'restore; rm -rf "$w" "$snap"' EXIT
 case "$h" in
   claude)  cmd=(claude -p "$PROMPT" --output-format stream-json --verbose) ;;
   cursor)  cmd=(cursor-agent -p "$PROMPT" --output-format stream-json --trust --workspace "$w") ;;
