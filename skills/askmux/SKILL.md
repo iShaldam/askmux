@@ -35,6 +35,13 @@ question tool; never invent a tool name.
    to Plan mode; Cursor: pick a model that has `AskQuestion`), then ask once
    in plain text with the same options, labelled A, B, C, recommended first.
 
+## If no one answers
+
+The tool can be there and still get no answer: it comes back skipped,
+empty, or says no user or operator is available. Treat that as a headless
+run. Don't re-ask in plain text; take the recommended option, say so in one
+line, and keep going. In Study mode, stop: there's no one to quiz.
+
 ## Two modes
 
 Pick from context; don't ask which.
