@@ -169,6 +169,31 @@ class Docs(unittest.TestCase):
         for t in tools:
             self.assertIn(f"`{t}`", matrix, t)
 
+    def test_readme_grid_comes_first(self):
+        readme = read("README.md")
+        heading = readme.index("## what it does")
+        first_row = re.search(r"^\|.*\|$", readme, re.M)
+        self.assertIsNotNone(first_row)
+        self.assertLess(first_row.start(), heading)
+        grid = readme[:heading]
+        tools = re.findall(r"^\| [^|]+\| `(\w+)`", grid, re.M)
+        self.assertEqual(len(tools), len(TOOLS))
+        self.assertEqual(set(tools), set(TOOLS.values()))
+        for tool in TOOLS.values():
+            self.assertEqual(tools.count(tool), 1)
+
+    def test_readme_grid_marks_headless(self):
+        readme = read("README.md")
+        heading = readme.index("## what it does")
+        rows = [row for row in re.findall(r"^\|.*\|$", readme[:heading], re.M)
+                if "`" in row]
+        self.assertEqual(len(rows), len(TOOLS))
+        for row in rows:
+            cells = row.split("|")[1:-1]
+            self.assertEqual(len(cells), 5)
+            self.assertIn(cells[2].strip()[0], "✓✗~")
+            self.assertIn(cells[3].strip()[0], "✓✗~")
+
 
 if __name__ == "__main__":
     unittest.main()

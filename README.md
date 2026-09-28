@@ -1,7 +1,19 @@
 # askmux
 
-One ask-the-user skill for every coding agent harness, and a tested matrix
-of which question tool actually shows up where.
+AskUserQuestion for every coding agent: one skill, plus a tested matrix of which harnesses actually offer a question tool, by mode and model.
+
+| harness | tool | interactive | headless | notes |
+|---|---|---|---|---|
+| Claude Code | `AskUserQuestion` | ✓ | ✗ `claude -p` | ✓ in the Agent SDK with a permission handler |
+| Cursor | `AskQuestion` | ✓ model-gated | ~ Composer 2.5 calls it, the answer comes back "skipped" | ✗ on Grok 4.5 High and Auto, both modes |
+| Antigravity | `ask_question` | ✓ | ~ listed, the call can't be proven | headless picks for you |
+| Codex | `request_user_input` | ✓ Plan mode only | ✗ `codex exec` | Default mode needs the `default_mode_request_user_input` feature; some models get `request_user_input_async` |
+| Copilot CLI | `ask_user` | ✓ | ✗ `copilot -p` | `--no-ask-user` turns it off |
+| Grok CLI | `ask_user_question` | ✓ | ~ called, but no operator answers | |
+
+✓ offered and answered · ✗ not offered · ~ offered, but nobody answers or the call can't be proven
+
+[MATRIX.md](MATRIX.md) has every run: mode, model, result, and where the evidence comes from.
 
 Every harness has its own tool for asking you a multiple-choice question:
 `AskUserQuestion` in Claude Code, `AskQuestion` in Cursor, `ask_question` in
@@ -26,21 +38,6 @@ It picks one of two modes from context. **Requirements** ("ask me what you
 need") asks only what changes what gets built, 4 questions at most.
 **Study** ("quiz me on this") asks one question at a time, says right or
 wrong with a one-line why, and scores you at the end.
-
-## where it works
-
-Short version, from headless probes and reported sources:
-
-- **Grok CLI** calls it, even in `grok -p`.
-- **Cursor** depends on the model: Composer 2.5 calls it, Grok 4.5 doesn't
-  have it.
-- **Claude Code** and **Copilot CLI** don't offer it in print mode (`-p`).
-- **Codex** only offers it in Plan mode, which is TUI-only.
-- **Antigravity** lists it, but its stream doesn't label the call, so a
-  headless run can't prove it happened.
-
-[`MATRIX.md`](MATRIX.md) has every run: mode, model, result, and where the
-evidence comes from.
 
 ## install
 

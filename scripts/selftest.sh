@@ -6,7 +6,7 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 missed=0
 plant() {  # name, sed expression
   tmp="$(mktemp -d)"
-  cp -R "$root/scripts" "$root/tests" "$root/skills" "$root/MATRIX.md" "$tmp/"
+  cp -R "$root/scripts" "$root/tests" "$root/skills" "$root/MATRIX.md" "$root/README.md" "$tmp/"
   sed -i.bak "$2" "$tmp/scripts/probe.sh"
   if cmp -s "$tmp/scripts/probe.sh" "$tmp/scripts/probe.sh.bak"; then
     echo "selftest: plant '$1' did not apply -- the canary is stale"; missed=1
