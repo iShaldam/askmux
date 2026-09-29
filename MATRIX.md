@@ -16,6 +16,7 @@ know. Evidence:
   - `n/a` (tool not offered)
   - `unknown` (not measured yet)
 
+<!-- matrix:start -->
 | harness | tool | surface / mode | model | result | unanswered | evidence |
 |---|---|---|---|---|---|---|
 | `claude` | `AskUserQuestion` | desktop app, interactive | claude-opus-5-5 | works | times out: after 60s the tool returns "No response after 60s ... proceed using your best judgment" | manual, 2026-09-25, [anthropics/claude-code#73125](https://github.com/anthropics/claude-code/issues/73125) |
@@ -39,6 +40,7 @@ know. Evidence:
 | `codex` | `request_user_input` | TUI, Plan mode | — | offered; Default mode says it's unavailable unless `[features] default_mode_request_user_input = true` (under development, off by default); Default mode auto-resolves after about a minute with an empty answer | blocks | reported, [openai/codex#29104](https://github.com/openai/codex/issues/29104), [#11536](https://github.com/openai/codex/issues/11536), [flag](https://github.com/openai/codex/blob/0fbf0bedc25d0effec4b758030772468339d315c/codex-rs/features/src/lib.rs#L1613-L1618), [openai/codex#34455](https://github.com/openai/codex/issues/34455), [#37472](https://github.com/openai/codex/issues/37472) |
 | `codex` | `request_user_input` | `codex app-server` | — | sent as the JSON-RPC request `item/tool/requestUserInput` (experimental) | unknown | reported, [source](https://github.com/openai/codex/blob/25270df2615eb4da5b9d4a9a392226933fb096c5/codex-rs/app-server-protocol/src/protocol/common.rs#L1777-L1781) |
 | `codex` | `request_user_input_async` | Default mode, models whose catalog lists it | — | offered to the main agent, not subagents | unknown | reported, [source](https://github.com/openai/codex/blob/0fbf0bedc25d0effec4b758030772468339d315c/codex-rs/core/src/tools/spec_plan.rs#L1178-L1193) |
+<!-- matrix:end -->
 
 ## notes
 

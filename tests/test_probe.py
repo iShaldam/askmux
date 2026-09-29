@@ -8,6 +8,7 @@ import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROBE = os.path.join(ROOT, "scripts", "probe.sh")
+MATRIX_JSON = os.path.join(ROOT, "matrix.json")
 ECHO = '{"type":"user","text":"...built-in tool for asking the user a question... reply exactly NO_ASK_TOOL."}\n'
 
 # one call event per harness. grok's and cursor's are trimmed from real runs;
@@ -47,6 +48,66 @@ def read_abs(path):
 
 def read(path):
     return read_abs(os.path.join(ROOT, path))
+
+
+def load_matrix(path=MATRIX_JSON):
+    with open(path) as f:
+        return json.load(f)
+
+
+class Matrix(unittest.TestCase):
+    def test_matrix_json_rows_are_complete(self):
+        matrix = load_matrix()
+        rows = matrix["rows"]
+        self.assertIsInstance(rows, list)
+        self.assertTrue(rows)
+        keys = {"harness", "tool", "surface", "model", "result",
+                "unanswered", "evidence", "date", "cli_version"}
+        for row in rows:
+            self.assertEqual(set(row), keys)
+            self.assertIn(row["harness"], CALLS)
+            expected = TOOLS[row["harness"]]
+            allowed = (expected, "request_user_input_async") if row["harness"] == "codex" else (expected,)
+            self.assertIn(row["tool"], allowed)
+            self.assertTrue(row["unanswered"].startswith(UNANSWERED))
+            self.assertRegex(row["date"], r"^\d{4}-\d{2}-\d{2}$")
+            self.assertTrue(isinstance(row["cli_version"], str) or row["cli_version"] is None)
+        self.assertEqual(set(matrix["harnesses"]), set(CALLS))
+        for harness in CALLS:
+            self.assertTrue(any(row["harness"] == harness for row in rows))
+
+    def test_matrix_harness_entries_are_complete(self):
+        matrix = load_matrix()
+        keys = {"name", "tool", "where", "grid"}
+        for harness in CALLS:
+            entry = matrix["harnesses"][harness]
+            self.assertEqual(set(entry), keys)
+            self.assertEqual(entry["tool"], TOOLS[harness])
+            self.assertEqual(set(entry["grid"]), {"interactive", "headless", "notes"})
+            for mode in ("interactive", "headless"):
+                self.assertIn(entry["grid"][mode][0], "✓✗~")
+
+    def test_rendered_tables_match_checked_in(self):
+        r = subprocess.run(["python3", os.path.join(ROOT, "scripts", "matrix.py"), "check"],
+                           text=True, capture_output=True)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+    def test_check_notices_drift(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for name in ("scripts", "skills"):
+                shutil.copytree(os.path.join(ROOT, name), os.path.join(tmp, name))
+            for name in ("MATRIX.md", "README.md", "matrix.json"):
+                shutil.copy(os.path.join(ROOT, name), os.path.join(tmp, name))
+            path = os.path.join(tmp, "matrix.json")
+            matrix = load_matrix(path)
+            matrix["rows"][0]["result"] = "drifted"
+            with open(path, "w") as f:
+                json.dump(matrix, f, indent=2, ensure_ascii=False)
+                f.write("\n")
+            r = subprocess.run(["python3", os.path.join(tmp, "scripts", "matrix.py"), "check"],
+                               cwd=tmp, text=True, capture_output=True)
+            self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+            self.assertIn("MATRIX.md", r.stdout + r.stderr)
 
 
 class Classify(unittest.TestCase):

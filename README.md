@@ -2,6 +2,7 @@
 
 AskUserQuestion for every coding agent: one skill, plus a tested matrix of which harnesses actually offer a question tool, by mode and model.
 
+<!-- matrix:start -->
 | harness | tool | interactive | headless | notes |
 |---|---|---|---|---|
 | Claude Code | `AskUserQuestion` | ✓ | ✗ `claude -p` | ✓ in the Agent SDK with a permission handler |
@@ -10,6 +11,7 @@ AskUserQuestion for every coding agent: one skill, plus a tested matrix of which
 | Codex | `request_user_input` | ✓ Plan mode only | ✗ `codex exec` | Default mode needs the `default_mode_request_user_input` feature; some models get `request_user_input_async` |
 | Copilot CLI | `ask_user` | ✓ | ✗ `copilot -p` | `--no-ask-user` turns it off |
 | Grok CLI | `ask_user_question` | ✓ | ~ called, but no operator answers | |
+<!-- matrix:end -->
 
 ✓ offered and answered · ✗ not offered · ~ offered, but nobody answers or the call can't be proven
 

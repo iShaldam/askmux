@@ -1,0 +1,297 @@
+{
+  "harnesses": {
+    "claude": {
+      "name": "Claude Code",
+      "tool": "AskUserQuestion",
+      "where": "interactive, and the Agent SDK; not in `claude -p`",
+      "grid": {
+        "interactive": "✓",
+        "headless": "✗ `claude -p`",
+        "notes": "✓ in the Agent SDK with a permission handler"
+      }
+    },
+    "cursor": {
+      "name": "Cursor",
+      "tool": "AskQuestion",
+      "where": "model-gated: Composer 2.5 has it, Grok 4.5 and Auto didn't; headless skips the answer",
+      "grid": {
+        "interactive": "✓ model-gated",
+        "headless": "~ Composer 2.5 calls it, the answer comes back \"skipped\"",
+        "notes": "✗ on Grok 4.5 High and Auto, both modes"
+      }
+    },
+    "agy": {
+      "name": "Antigravity",
+      "tool": "ask_question",
+      "where": "interactive; listed in `agy -p`, but headless picks for you",
+      "grid": {
+        "interactive": "✓",
+        "headless": "~ listed, the call can't be proven",
+        "notes": "headless picks for you"
+      }
+    },
+    "codex": {
+      "name": "Codex",
+      "tool": "request_user_input",
+      "where": "Plan mode in the TUI (Default mode too with the `default_mode_request_user_input` feature); not in `codex exec`. Some models get `request_user_input_async` instead",
+      "grid": {
+        "interactive": "✓ Plan mode only",
+        "headless": "✗ `codex exec`",
+        "notes": "Default mode needs the `default_mode_request_user_input` feature; some models get `request_user_input_async`"
+      }
+    },
+    "copilot": {
+      "name": "Copilot CLI",
+      "tool": "ask_user",
+      "where": "interactive; not in `copilot -p`",
+      "grid": {
+        "interactive": "✓",
+        "headless": "✗ `copilot -p`",
+        "notes": "`--no-ask-user` turns it off"
+      }
+    },
+    "grok": {
+      "name": "Grok CLI",
+      "tool": "ask_user_question",
+      "where": "interactive and `grok -p`",
+      "grid": {
+        "interactive": "✓",
+        "headless": "~ called, but no operator answers",
+        "notes": ""
+      }
+    }
+  },
+  "rows": [
+    {
+      "harness": "claude",
+      "tool": "AskUserQuestion",
+      "surface": "desktop app, interactive",
+      "model": "claude-opus-5-5",
+      "result": "works",
+      "unanswered": "times out: after 60s the tool returns \"No response after 60s ... proceed using your best judgment\"",
+      "evidence": "manual, 2026-09-25, [anthropics/claude-code#73125](https://github.com/anthropics/claude-code/issues/73125)",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "claude",
+      "tool": "AskUserQuestion",
+      "surface": "`claude -p`",
+      "model": "claude-sonnet-5",
+      "result": "not offered: tool search finds nothing, replies NO_ASK_TOOL",
+      "unanswered": "n/a",
+      "evidence": "probe exit 1, 2026-09-25",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "claude",
+      "tool": "AskUserQuestion",
+      "surface": "`claude -p --permission-mode plan`",
+      "model": "claude-sonnet-5",
+      "result": "not offered",
+      "unanswered": "n/a",
+      "evidence": "probe exit 1, 2026-09-25",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "claude",
+      "tool": "AskUserQuestion",
+      "surface": "Agent SDK, with a permission handler attached",
+      "model": "—",
+      "result": "offered; plain `-p` hides it since 2.1.187",
+      "unanswered": "unknown",
+      "evidence": "reported, [anthropics/claude-code#77994](https://github.com/anthropics/claude-code/issues/77994)",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "cursor",
+      "tool": "AskQuestion",
+      "surface": "IDE agent",
+      "model": "varies",
+      "result": "works in Plan mode, varies by model",
+      "unanswered": "unknown",
+      "evidence": "reported (community), [forum](https://forum.cursor.com/t/allow-askquestion-tool-calls-in-agent-mode-or-any-mode/152517)",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "cursor",
+      "tool": "AskQuestion",
+      "surface": "`cursor-agent -p`",
+      "model": "Grok 4.5 High",
+      "result": "not offered (two runs)",
+      "unanswered": "n/a",
+      "evidence": "probe exit 1, 2026-09-25",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "cursor",
+      "tool": "AskQuestion",
+      "surface": "`cursor-agent -p --mode plan`",
+      "model": "Grok 4.5 High",
+      "result": "not offered",
+      "unanswered": "n/a",
+      "evidence": "probe exit 1, 2026-09-25",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "cursor",
+      "tool": "AskQuestion",
+      "surface": "`cursor-agent -p --model auto`",
+      "model": "Auto (routed model not shown)",
+      "result": "not offered",
+      "unanswered": "n/a",
+      "evidence": "probe exit 1, 2026-09-25",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "cursor",
+      "tool": "AskQuestion",
+      "surface": "`cursor-agent -p`",
+      "model": "Composer 2.5",
+      "result": "called (`askQuestionToolCall`); headless answers it with \"Questions skipped by the user\"",
+      "unanswered": "skipped",
+      "evidence": "probe exit 0, 2026-09-25",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "cursor",
+      "tool": "AskQuestion",
+      "surface": "`cursor-agent -p --mode plan`",
+      "model": "Composer 2.5",
+      "result": "called",
+      "unanswered": "skipped",
+      "evidence": "probe exit 0, 2026-09-25",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "agy",
+      "tool": "ask_question",
+      "surface": "`agy -p`",
+      "model": "not reported",
+      "result": "inconclusive: in the tool list, one unlabelled step ran, and the model says it asked",
+      "unanswered": "auto-picks",
+      "evidence": "probe exit 3, 2026-09-25",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "agy",
+      "tool": "ask_question",
+      "surface": "`agy -p --mode plan`",
+      "model": "not reported",
+      "result": "inconclusive, same pattern",
+      "unanswered": "auto-picks",
+      "evidence": "probe exit 3, 2026-09-25",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "agy",
+      "tool": "ask_question",
+      "surface": "interactive",
+      "model": "—",
+      "result": "offered; headless runs settle the choice themselves",
+      "unanswered": "unknown",
+      "evidence": "reported, releases [1.2.7](https://github.com/google-antigravity/antigravity-cli/releases/tag/1.2.7), [1.1.12](https://github.com/google-antigravity/antigravity-cli/releases/tag/1.1.12)",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "copilot",
+      "tool": "ask_user",
+      "surface": "`copilot -p` (1.0.88)",
+      "model": "mai-code-1.1-flash",
+      "result": "not offered",
+      "unanswered": "n/a",
+      "evidence": "probe exit 1, 2026-09-25",
+      "date": "2026-09-25",
+      "cli_version": "1.0.88"
+    },
+    {
+      "harness": "copilot",
+      "tool": "ask_user",
+      "surface": "interactive",
+      "model": "—",
+      "result": "offered; `--no-ask-user` turns it off",
+      "unanswered": "unknown",
+      "evidence": "reported, [CLI reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference), [github/copilot-cli#2929](https://github.com/github/copilot-cli/issues/2929)",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "grok",
+      "tool": "ask_user_question",
+      "surface": "`grok -p`",
+      "model": "grok-4.7",
+      "result": "called",
+      "unanswered": "no operator",
+      "evidence": "probe exit 0, 2026-09-25",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "grok",
+      "tool": "ask_user_question",
+      "surface": "interactive",
+      "model": "—",
+      "result": "offered; in `-p` an unanswered question returns a \"no operator\" result",
+      "unanswered": "unknown",
+      "evidence": "reported, [source](https://github.com/xai-org/grok-build/blob/f0e3be1100ef5252488e3be8bb0e91cf68d8c305/crates/codegen/xai-grok-tools/src/implementations/grok_build/ask_user_question/mod.rs#L101-L105)",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "codex",
+      "tool": "request_user_input",
+      "surface": "`codex exec`",
+      "model": "—",
+      "result": "not offered; exec rejects the request as \"not supported in exec mode\"",
+      "unanswered": "n/a",
+      "evidence": "reported, [source](https://github.com/openai/codex/blob/25270df2615eb4da5b9d4a9a392226933fb096c5/codex-rs/exec/src/lib.rs#L2038-L2048)",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "codex",
+      "tool": "request_user_input",
+      "surface": "TUI, Plan mode",
+      "model": "—",
+      "result": "offered; Default mode says it's unavailable unless `[features] default_mode_request_user_input = true` (under development, off by default); Default mode auto-resolves after about a minute with an empty answer",
+      "unanswered": "blocks",
+      "evidence": "reported, [openai/codex#29104](https://github.com/openai/codex/issues/29104), [#11536](https://github.com/openai/codex/issues/11536), [flag](https://github.com/openai/codex/blob/0fbf0bedc25d0effec4b758030772468339d315c/codex-rs/features/src/lib.rs#L1613-L1618), [openai/codex#34455](https://github.com/openai/codex/issues/34455), [#37472](https://github.com/openai/codex/issues/37472)",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "codex",
+      "tool": "request_user_input",
+      "surface": "`codex app-server`",
+      "model": "—",
+      "result": "sent as the JSON-RPC request `item/tool/requestUserInput` (experimental)",
+      "unanswered": "unknown",
+      "evidence": "reported, [source](https://github.com/openai/codex/blob/25270df2615eb4da5b9d4a9a392226933fb096c5/codex-rs/app-server-protocol/src/protocol/common.rs#L1777-L1781)",
+      "date": "2026-09-25",
+      "cli_version": null
+    },
+    {
+      "harness": "codex",
+      "tool": "request_user_input_async",
+      "surface": "Default mode, models whose catalog lists it",
+      "model": "—",
+      "result": "offered to the main agent, not subagents",
+      "unanswered": "unknown",
+      "evidence": "reported, [source](https://github.com/openai/codex/blob/0fbf0bedc25d0effec4b758030772468339d315c/codex-rs/core/src/tools/spec_plan.rs#L1178-L1193)",
+      "date": "2026-09-25",
+      "cli_version": null
+    }
+  ]
+}

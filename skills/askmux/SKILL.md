@@ -15,6 +15,7 @@ question tool; never invent a tool name.
 
 ## Which tool
 
+<!-- matrix:start -->
 | Harness | Tool | Where it works |
 |---|---|---|
 | Claude Code | `AskUserQuestion` | interactive, and the Agent SDK; not in `claude -p` |
@@ -23,6 +24,7 @@ question tool; never invent a tool name.
 | Codex | `request_user_input` | Plan mode in the TUI (Default mode too with the `default_mode_request_user_input` feature); not in `codex exec`. Some models get `request_user_input_async` instead |
 | Copilot CLI | `ask_user` | interactive; not in `copilot -p` |
 | Grok CLI | `ask_user_question` | interactive and `grok -p` |
+<!-- matrix:end -->
 
 [MATRIX.md](https://github.com/iShaldam/askmux/blob/main/MATRIX.md) has the tested detail per mode and model.
 
