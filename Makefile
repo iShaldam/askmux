@@ -1,9 +1,12 @@
-.PHONY: check test selftest validate leakscan probe matrix
+.PHONY: check test selftest validate leakscan probe matrix watch
 
 check: validate matrix test selftest
 
 matrix:
 	python3 scripts/matrix.py check
+
+watch:
+	python3 scripts/watch.py check
 
 validate:
 	claude plugin validate --strict .

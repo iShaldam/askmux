@@ -1,4 +1,5 @@
 import json
+import importlib.util
 import os
 import re
 import shutil
@@ -53,6 +54,9 @@ def read(path):
 def load_matrix(path=MATRIX_JSON):
     with open(path) as f:
         return json.load(f)
+
+
+WATCH_PATH = os.path.join(ROOT, "scripts", "watch.py")
 
 
 class Matrix(unittest.TestCase):
@@ -272,6 +276,63 @@ class Docs(unittest.TestCase):
         self.assertEqual(set(tools), set(TOOLS.values()))
         for tool in TOOLS.values():
             self.assertEqual(tools.count(tool), 1)
+
+
+class Watch(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        global watch
+        spec = importlib.util.spec_from_file_location("watch", WATCH_PATH)
+        watch = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(watch)
+
+    def test_links_from_matrix(self):
+        matrix = load_matrix()
+        links = watch.links(matrix)
+        self.assertEqual(links, sorted(links, key=lambda link: link["url"]))
+        self.assertEqual(len({link["url"] for link in links}), len(links))
+        self.assertGreaterEqual(sum(link["kind"] == "issue" for link in links), 7)
+        self.assertGreaterEqual(sum(link["kind"] == "code" for link in links), 5)
+        evidence = "\n".join(row["evidence"] for row in matrix["rows"])
+        self.assertTrue(all(link["url"] in evidence for link in links))
+
+    def test_links_parses_fixture(self):
+        matrix = {"rows": [{"evidence": (
+            "https://github.com/acme/app/issues/7 "
+            "https://github.com/acme/app/blob/" + "a" * 40 + "/one.py#L3 "
+            "https://github.com/acme/app/blob/" + "b" * 40 + "/two.py#L4-L6 "
+            "https://github.com/acme/app/releases/tag/v1 "
+            "https://forum.example/item"
+        )}, {"evidence": "https://github.com/acme/app/issues/7"}]}
+        self.assertEqual(watch.links(matrix), [
+            {"kind": "code", "url": "https://github.com/acme/app/blob/" + "a" * 40 + "/one.py#L3",
+             "repo": "acme/app", "sha": "a" * 40, "path": "one.py", "start": 3, "end": 3},
+            {"kind": "code", "url": "https://github.com/acme/app/blob/" + "b" * 40 + "/two.py#L4-L6",
+             "repo": "acme/app", "sha": "b" * 40, "path": "two.py", "start": 4, "end": 6},
+            {"kind": "issue", "url": "https://github.com/acme/app/issues/7",
+             "repo": "acme/app", "number": 7},
+        ])
+
+    def test_moved_code(self):
+        pinned = [" first ", "second"]
+        self.assertFalse(watch.code_moved(pinned, "zero\nfirst\nsecond\nthree"))
+        self.assertTrue(watch.code_moved(pinned, "first\nthree\nsecond"))
+        self.assertTrue(watch.code_moved(pinned, "first\nthree"))
+
+    def test_diff_reports_changes(self):
+        baseline = {"a": "open", "b": "same", "d": "gone"}
+        current = {"a": "closed", "b": "same", "c": "moved"}
+        self.assertEqual(watch.diff(baseline, current), [
+            "a: open -> closed", "c: new", "d: dropped"
+        ])
+        self.assertEqual(watch.diff(baseline, baseline), [])
+
+    def test_watch_json_covers_matrix(self):
+        with open(os.path.join(ROOT, "watch.json")) as f:
+            baseline = json.load(f)
+        self.assertIsInstance(baseline, dict)
+        self.assertEqual(set(baseline), {link["url"] for link in watch.links(load_matrix())})
+        self.assertTrue(all(isinstance(value, str) for value in baseline.values()))
 
     def test_readme_grid_marks_headless(self):
         readme = read("README.md")
