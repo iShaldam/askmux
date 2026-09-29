@@ -31,6 +31,8 @@ TOOLS = {
     "grok": "ask_user_question",
     "codex": "request_user_input",
 }
+UNANSWERED = ("blocks", "times out", "skipped", "no operator", "auto-picks",
+              "n/a", "unknown")
 
 
 def classify(harness, log):
@@ -155,6 +157,34 @@ class Run(unittest.TestCase):
 
 
 class Docs(unittest.TestCase):
+    def test_matrix_has_unanswered_column(self):
+        rows = [line for line in read("MATRIX.md").splitlines()
+                if line.startswith("|")]
+        header = [cell.strip() for cell in rows[0].split("|")[1:-1]]
+        self.assertIn("unanswered", header)
+        self.assertEqual(header.index("unanswered"), header.index("result") + 1)
+        for row in rows[2:]:
+            cells = [cell.strip() for cell in row.split("|")[1:-1]]
+            self.assertEqual(len(cells), len(header))
+            self.assertTrue(cells[header.index("unanswered")].startswith(UNANSWERED))
+
+    def test_not_offered_rows_are_na(self):
+        rows = [line for line in read("MATRIX.md").splitlines()
+                if line.startswith("|")]
+        header = [cell.strip() for cell in rows[0].split("|")[1:-1]]
+        result = header.index("result")
+        unanswered = header.index("unanswered")
+        for row in rows[2:]:
+            cells = [cell.strip() for cell in row.split("|")[1:-1]]
+            if cells[result].startswith("not offered"):
+                self.assertEqual(cells[unanswered], "n/a")
+
+    def test_matrix_links_keep_full_shas(self):
+        matrix = read("MATRIX.md")
+        for sha in re.findall(r"github\.com/[^/\s]+/[^/\s]+/blob/([0-9a-f]+)/",
+                              matrix):
+            self.assertEqual(len(sha), 40)
+
     def test_every_probed_harness_has_a_matrix_row(self):
         harnesses = re.findall(r"^    (\w+)\)\s+echo", read("scripts/probe.sh"), re.M)
         self.assertEqual(sorted(harnesses), sorted(CALLS))
