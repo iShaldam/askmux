@@ -59,6 +59,46 @@
         "headless": "~ called, but no operator answers",
         "notes": ""
       }
+    },
+    "gemini": {
+      "name": "Gemini CLI",
+      "tool": "ask_user",
+      "where": "interactive; not in `gemini -p` or ACP mode",
+      "grid": {
+        "interactive": "✓",
+        "headless": "✗ `gemini -p`",
+        "notes": "same tool name as Copilot CLI"
+      }
+    },
+    "opencode": {
+      "name": "OpenCode",
+      "tool": "question",
+      "where": "on by default in the TUI and `opencode run --mini`; plain `opencode run` denies it",
+      "grid": {
+        "interactive": "✓",
+        "headless": "✗ `opencode run` denies it",
+        "notes": "`--mini` allows it; `\"permission\": {\"question\": \"deny\"}` turns it off"
+      }
+    },
+    "cline": {
+      "name": "Cline",
+      "tool": "ask_question",
+      "where": "CLI, interactive; with no terminal it picks the first option for you",
+      "grid": {
+        "interactive": "✓",
+        "headless": "~ offered, picks the first option",
+        "notes": "older builds and the VS Code extension call it `ask_followup_question`"
+      }
+    },
+    "pi": {
+      "name": "pi",
+      "tool": "ask_user_question",
+      "where": "not built in; the ghoseb/pi-askuserquestion extension adds it, interactive only",
+      "grid": {
+        "interactive": "~ extension only",
+        "headless": "✗ print / JSON mode",
+        "notes": "same tool name as Grok CLI"
+      }
     }
   },
   "rows": [
@@ -292,6 +332,94 @@
       "evidence": "reported, [source](https://github.com/openai/codex/blob/0fbf0bedc25d0effec4b758030772468339d315c/codex-rs/core/src/tools/spec_plan.rs#L1178-L1193)",
       "date": "2026-09-25",
       "cli_version": null
+    },
+    {
+      "harness": "gemini",
+      "tool": "ask_user",
+      "surface": "interactive",
+      "model": "—",
+      "result": "offered: pauses until answered or dismissed",
+      "unanswered": "blocks: waits for an answer; dismissing returns \"User dismissed ask_user dialog without answering.\"",
+      "evidence": "reported, [docs](https://geminicli.com/docs/tools/ask-user/), [ask-user.ts](https://github.com/google-gemini/gemini-cli/blob/40d4dccfa9aec692b27798ca819b918609e2bc60/packages/core/src/tools/ask-user.ts#L190-L193)",
+      "date": "2026-09-29",
+      "cli_version": "0.62.0"
+    },
+    {
+      "harness": "gemini",
+      "tool": "ask_user",
+      "surface": "`gemini -p`",
+      "model": "—",
+      "result": "not offered: excluded when not interactive, and in ACP mode",
+      "unanswered": "n/a",
+      "evidence": "reported, [config.ts](https://github.com/google-gemini/gemini-cli/blob/40d4dccfa9aec692b27798ca819b918609e2bc60/packages/cli/src/config/config.ts#L795-L803)",
+      "date": "2026-09-29",
+      "cli_version": "0.62.0"
+    },
+    {
+      "harness": "opencode",
+      "tool": "question",
+      "surface": "TUI, or `opencode run --mini`",
+      "model": "—",
+      "result": "offered, on by default",
+      "unanswered": "blocks: no timeout",
+      "evidence": "reported, [docs](https://opencode.ai/docs/tools/#question), [question/index.ts](https://github.com/anomalyco/opencode/blob/2fa3363c924c5c3e367b84a87ae478296a0ed59b/packages/opencode/src/question/index.ts#L96-L107)",
+      "date": "2026-09-29",
+      "cli_version": "1.18.33"
+    },
+    {
+      "harness": "opencode",
+      "tool": "question",
+      "surface": "`opencode run`",
+      "model": "—",
+      "result": "denied: a `question: deny` rule is added unless `--mini`",
+      "unanswered": "unknown: denied, but whether the model gets an error or never sees the tool isn't verified",
+      "evidence": "reported, [run.ts](https://github.com/anomalyco/opencode/blob/2fa3363c924c5c3e367b84a87ae478296a0ed59b/packages/opencode/src/cli/cmd/run.ts#L430-L437)",
+      "date": "2026-09-29",
+      "cli_version": "1.18.33"
+    },
+    {
+      "harness": "cline",
+      "tool": "ask_question",
+      "surface": "CLI, in a terminal",
+      "model": "—",
+      "result": "offered and auto-approved",
+      "unanswered": "blocks: reads the answer from the terminal, no timeout",
+      "evidence": "reported, [run-agent.ts](https://github.com/cline/cline/blob/fef9de1665d098ef13327656669cc43783151e0b/apps/cli/src/runtime/run-agent.ts#L163-L166), [approval.ts](https://github.com/cline/cline/blob/fef9de1665d098ef13327656669cc43783151e0b/apps/cli/src/utils/approval.ts#L128-L145)",
+      "date": "2026-09-29",
+      "cli_version": "3.0.65"
+    },
+    {
+      "harness": "cline",
+      "tool": "ask_question",
+      "surface": "CLI, stdin or stdout not a terminal",
+      "model": "—",
+      "result": "offered",
+      "unanswered": "auto-picks: returns the first option without asking",
+      "evidence": "reported, [approval.ts](https://github.com/cline/cline/blob/fef9de1665d098ef13327656669cc43783151e0b/apps/cli/src/utils/approval.ts#L120-L126)",
+      "date": "2026-09-29",
+      "cli_version": "3.0.65"
+    },
+    {
+      "harness": "pi",
+      "tool": "ask_user_question",
+      "surface": "TUI, with the ghoseb/pi-askuserquestion extension",
+      "model": "—",
+      "result": "not built in; the extension adds it",
+      "unanswered": "blocks: waits on the TUI; cancel returns \"User cancelled\"",
+      "evidence": "reported, [built-in tools](https://github.com/earendil-works/pi/blob/1b347794e2a630e4359f2584f4eea388145d0ddf/packages/coding-agent/src/core/tools/index.ts#L95), [extension](https://github.com/ghoseb/pi-askuserquestion/blob/e58609c9e9c8c4e8a0348c96eaad38dd7e6f0578/src/index.ts#L65-L71)",
+      "date": "2026-09-29",
+      "cli_version": "0.99.1"
+    },
+    {
+      "harness": "pi",
+      "tool": "ask_user_question",
+      "surface": "print / JSON mode, with the extension",
+      "model": "—",
+      "result": "loaded, but returns an error and turns itself off",
+      "unanswered": "no operator: error result, and the tool is off for the rest of the session",
+      "evidence": "reported, [extension](https://github.com/ghoseb/pi-askuserquestion/blob/e58609c9e9c8c4e8a0348c96eaad38dd7e6f0578/src/index.ts#L40-L56)",
+      "date": "2026-09-29",
+      "cli_version": "0.99.1"
     }
   ]
 }

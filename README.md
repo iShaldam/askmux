@@ -11,6 +11,10 @@ AskUserQuestion for every coding agent: one skill, plus a tested matrix of which
 | Codex | `request_user_input` | ✓ Plan mode only | ✗ `codex exec` | Default mode needs the `default_mode_request_user_input` feature; some models get `request_user_input_async` |
 | Copilot CLI | `ask_user` | ✓ | ✗ `copilot -p` | `--no-ask-user` turns it off |
 | Grok CLI | `ask_user_question` | ✓ | ~ called, but no operator answers | |
+| Gemini CLI | `ask_user` | ✓ | ✗ `gemini -p` | same tool name as Copilot CLI |
+| OpenCode | `question` | ✓ | ✗ `opencode run` denies it | `--mini` allows it; `"permission": {"question": "deny"}` turns it off |
+| Cline | `ask_question` | ✓ | ~ offered, picks the first option | older builds and the VS Code extension call it `ask_followup_question` |
+| pi | `ask_user_question` | ~ extension only | ✗ print / JSON mode | same tool name as Grok CLI |
 <!-- matrix:end -->
 
 ✓ offered and answered · ✗ not offered · ~ offered, but nobody answers or the call can't be proven

@@ -24,6 +24,10 @@ question tool; never invent a tool name.
 | Codex | `request_user_input` | Plan mode in the TUI (Default mode too with the `default_mode_request_user_input` feature); not in `codex exec`. Some models get `request_user_input_async` instead |
 | Copilot CLI | `ask_user` | interactive; not in `copilot -p` |
 | Grok CLI | `ask_user_question` | interactive and `grok -p` |
+| Gemini CLI | `ask_user` | interactive; not in `gemini -p` or ACP mode |
+| OpenCode | `question` | on by default in the TUI and `opencode run --mini`; plain `opencode run` denies it |
+| Cline | `ask_question` | CLI, interactive; with no terminal it picks the first option for you |
+| pi | `ask_user_question` | not built in; the ghoseb/pi-askuserquestion extension adds it, interactive only |
 <!-- matrix:end -->
 
 [MATRIX.md](https://github.com/iShaldam/askmux/blob/main/MATRIX.md) has the tested detail per mode and model.

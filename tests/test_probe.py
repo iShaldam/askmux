@@ -33,6 +33,13 @@ TOOLS = {
     "grok": "ask_user_question",
     "codex": "request_user_input",
 }
+# reported from public sources, not probed here
+REPORTED = {
+    "gemini": "ask_user",
+    "opencode": "question",
+    "cline": "ask_question",
+    "pi": "ask_user_question",
+}
 UNANSWERED = ("blocks", "times out", "skipped", "no operator", "auto-picks",
               "n/a", "unknown")
 
@@ -69,27 +76,38 @@ class Matrix(unittest.TestCase):
                 "unanswered", "evidence", "date", "cli_version"}
         for row in rows:
             self.assertEqual(set(row), keys)
-            self.assertIn(row["harness"], CALLS)
-            expected = TOOLS[row["harness"]]
+            self.assertIn(row["harness"], set(CALLS) | set(REPORTED))
+            expected = {**TOOLS, **REPORTED}[row["harness"]]
             allowed = (expected, "request_user_input_async") if row["harness"] == "codex" else (expected,)
             self.assertIn(row["tool"], allowed)
             self.assertTrue(row["unanswered"].startswith(UNANSWERED))
             self.assertRegex(row["date"], r"^\d{4}-\d{2}-\d{2}$")
             self.assertTrue(isinstance(row["cli_version"], str) or row["cli_version"] is None)
-        self.assertEqual(set(matrix["harnesses"]), set(CALLS))
-        for harness in CALLS:
+        self.assertEqual(set(matrix["harnesses"]), set(CALLS) | set(REPORTED))
+        for harness in set(CALLS) | set(REPORTED):
             self.assertTrue(any(row["harness"] == harness for row in rows))
 
     def test_matrix_harness_entries_are_complete(self):
         matrix = load_matrix()
         keys = {"name", "tool", "where", "grid"}
-        for harness in CALLS:
+        self.assertEqual(set(matrix["harnesses"]), set(CALLS) | set(REPORTED))
+        for harness in set(CALLS) | set(REPORTED):
             entry = matrix["harnesses"][harness]
             self.assertEqual(set(entry), keys)
-            self.assertEqual(entry["tool"], TOOLS[harness])
+            self.assertEqual(entry["tool"], {**TOOLS, **REPORTED}[harness])
             self.assertEqual(set(entry["grid"]), {"interactive", "headless", "notes"})
             for mode in ("interactive", "headless"):
                 self.assertIn(entry["grid"][mode][0], "✓✗~")
+
+    def test_reported_harnesses_are_reported(self):
+        matrix = load_matrix()
+        rows = [row for row in matrix["rows"] if row["harness"] in REPORTED]
+        for row in rows:
+            self.assertTrue(row["evidence"].startswith("reported, "))
+            self.assertIn("https://", row["evidence"])
+            self.assertIsNotNone(row["cli_version"])
+        for harness in REPORTED:
+            self.assertGreaterEqual(sum(row["harness"] == harness for row in rows), 2)
 
     def test_rendered_tables_match_checked_in(self):
         r = subprocess.run(["python3", os.path.join(ROOT, "scripts", "matrix.py"), "check"],
@@ -259,7 +277,7 @@ class Docs(unittest.TestCase):
 
     def test_every_skill_tool_is_in_the_matrix(self):
         tools = set(re.findall(r"^\| [^|]+\| `(\w+)`", read("skills/askmux/SKILL.md"), re.M))
-        self.assertEqual(tools, set(TOOLS.values()))
+        self.assertEqual(tools, set(TOOLS.values()) | set(REPORTED.values()))
         matrix = read("MATRIX.md")
         for t in tools:
             self.assertIn(f"`{t}`", matrix, t)
@@ -271,11 +289,15 @@ class Docs(unittest.TestCase):
         self.assertIsNotNone(first_row)
         self.assertLess(first_row.start(), heading)
         grid = readme[:heading]
+        harnesses = [row.split("|")[1].strip() for row in re.findall(r"^\|.*\|$", grid, re.M)
+                     if "`" in row]
+        self.assertEqual(len(harnesses), len(set(harnesses)))
         tools = re.findall(r"^\| [^|]+\| `(\w+)`", grid, re.M)
-        self.assertEqual(len(tools), len(TOOLS))
-        self.assertEqual(set(tools), set(TOOLS.values()))
-        for tool in TOOLS.values():
-            self.assertEqual(tools.count(tool), 1)
+        self.assertEqual(len(tools), len(TOOLS) + len(REPORTED))
+        self.assertEqual(set(tools), set(TOOLS.values()) | set(REPORTED.values()))
+        expected_counts = (list(TOOLS.values()) + list(REPORTED.values()))
+        for tool in set(expected_counts):
+            self.assertEqual(tools.count(tool), expected_counts.count(tool))
 
 
     def test_readme_grid_marks_headless(self):
@@ -283,7 +305,7 @@ class Docs(unittest.TestCase):
         heading = readme.index("## what it does")
         rows = [row for row in re.findall(r"^\|.*\|$", readme[:heading], re.M)
                 if "`" in row]
-        self.assertEqual(len(rows), len(TOOLS))
+        self.assertEqual(len(rows), len(TOOLS) + len(REPORTED))
         for row in rows:
             cells = row.split("|")[1:-1]
             self.assertEqual(len(cells), 5)

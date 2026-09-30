@@ -87,11 +87,13 @@ def main():
     if sys.argv[1:] != ["check"]:
         print("usage: watch.py check|update")
         return 2
-    try:
-        current = {link["url"]: state(link, token) for link in items}
-    except (OSError, urllib.error.URLError, TimeoutError) as error:
-        print(f"watch error: {error}", file=sys.stderr)
-        return 2
+    current = {}
+    for link in items:
+        try:
+            current[link["url"]] = state(link, token)
+        except (OSError, urllib.error.URLError, TimeoutError) as error:
+            print(f"watch error: {link['url']}: {error}", file=sys.stderr)
+            return 2
     with open(os.path.join(ROOT, "watch.json")) as file:
         baseline = json.load(file)
     changes = diff(baseline, current)
