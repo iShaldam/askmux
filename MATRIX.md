@@ -16,6 +16,8 @@ know. Evidence:
   - `n/a` (tool not offered)
   - `unknown` (not measured yet)
 
+A weekly Action re-checks every cited issue and pinned source line and opens an issue when one moves; `make watch` runs it locally.
+
 <!-- matrix:start -->
 | harness | tool | surface / mode | model | result | unanswered | evidence |
 |---|---|---|---|---|---|---|
