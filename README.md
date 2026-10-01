@@ -1,6 +1,15 @@
 # askmux
 
-AskUserQuestion for every coding agent: one skill, plus a tested matrix of which harnesses actually offer a question tool, by mode and model.
+Your skill says "ask me", and half your coding agents have no tool to ask with. askmux is one skill that tells the model which question tool its harness has, plus a tested matrix of who offers one, by mode and model.
+
+Install in Claude Code:
+
+```
+/plugin marketplace add iShaldam/askmux
+/plugin install askmux@askmux
+```
+
+Other harnesses: copy `skills/askmux/` into that harness's skills folder (Cursor: `~/.cursor/skills/`).
 
 <!-- matrix:start -->
 | harness | tool | interactive | headless | notes |
@@ -44,18 +53,6 @@ It picks one of two modes from context. **Requirements** ("ask me what you
 need") asks only what changes what gets built, 4 questions at most.
 **Study** ("quiz me on this") asks one question at a time, says right or
 wrong with a one-line why, and scores you at the end.
-
-## install
-
-Claude Code:
-
-```
-/plugin marketplace add iShaldam/askmux
-/plugin install askmux@askmux
-```
-
-Other harnesses: copy `skills/askmux/` into that harness's skills folder
-(Cursor: `~/.cursor/skills/`).
 
 ## the probe
 
