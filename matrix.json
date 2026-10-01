@@ -370,12 +370,12 @@
       "harness": "opencode",
       "tool": "question",
       "surface": "`opencode run`",
-      "model": "—",
-      "result": "denied: a `question: deny` rule is added unless `--mini`",
-      "unanswered": "unknown: denied, but whether the model gets an error or never sees the tool isn't verified",
-      "evidence": "reported, [run.ts](https://github.com/anomalyco/opencode/blob/2fa3363c924c5c3e367b84a87ae478296a0ed59b/packages/opencode/src/cli/cmd/run.ts#L430-L437)",
-      "date": "2026-09-29",
-      "cli_version": "1.18.33"
+      "model": "opencode/big-pickle",
+      "result": "not offered: the model replies NO_ASK_TOOL",
+      "unanswered": "n/a",
+      "evidence": "probe exit 1, 2026-09-30; reported, [run.ts](https://github.com/anomalyco/opencode/blob/2fa3363c924c5c3e367b84a87ae478296a0ed59b/packages/opencode/src/cli/cmd/run.ts#L430-L437)",
+      "date": "2026-09-30",
+      "cli_version": "1.18.32"
     },
     {
       "harness": "cline",
