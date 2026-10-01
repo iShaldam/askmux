@@ -18,6 +18,7 @@ called() {  # a pattern only a real call event matches
     copilot) echo '"type":"tool\.execution_start".*"toolName":"ask_user"' ;;  # not its tool list
     grok)    echo '"toolName":"ask_user_question"' ;;
     codex)   echo '"method":"item/tool/requestUserInput"' ;;  # app-server only; exec never offers it
+    opencode) echo '"tool":"question"' ;;
     *) return 1 ;;
   esac
 }
@@ -64,6 +65,7 @@ with open(cfg, "w") as f: json.dump(new, f, indent=2)
 PY
 }
 trap 'restore; rm -rf "$w" "$snap"; [ "$h" = cursor ] && rmdir "$lock"' EXIT
+in=/dev/stdin
 case "$h" in
   claude)  cmd=(claude -p "$PROMPT" --output-format stream-json --verbose) ;;
   cursor)  cmd=(cursor-agent -p "$PROMPT" --output-format stream-json --trust --workspace "$w") ;;
@@ -71,11 +73,13 @@ case "$h" in
   copilot) cmd=(copilot -p "$PROMPT" --output-format json -s) ;;
   grok)    cmd=(grok -p "$PROMPT" --output-format streaming-json) ;;
   codex)   cmd=(codex exec --json "$PROMPT") ;;
+  opencode) cmd=(opencode run --format json -m opencode/big-pickle "$PROMPT")  # free model, no login
+            in=/dev/null ;;  # it waits on stdin when not a tty and the run hangs
 esac
 command -v "${cmd[0]}" >/dev/null || { echo "probe: $h -> 2 (${cmd[0]} not installed)"; exit 2; }
 mkdir -p "$root/runs"
 log="$root/runs/$(date +%Y%m%d-%H%M%S)-$h.jsonl"
-(cd "$w" && timeout "${PROBE_TIMEOUT:-150}" "${cmd[@]}" "$@") > "$log" 2>&1
+(cd "$w" && timeout "${PROBE_TIMEOUT:-150}" "${cmd[@]}" "$@") < "$in" > "$log" 2>&1
 rc=$?
 [ $rc = 124 ] || { classify "$h" < "$log"; rc=$?; }
 echo "probe: $h $* -> $rc (log: ${log#"$root"/})"

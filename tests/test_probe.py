@@ -23,6 +23,8 @@ CALLS = {
     "grok": '{"type":"tool_call","title":"ask_user_question","toolName":"ask_user_question"}',
     # unverified: codex exec never offers the tool; only app-server sends this
     "codex": '{"jsonrpc":"2.0","id":0,"method":"item/tool/requestUserInput","params":{}}',
+    # unverified: `opencode run` never offered it, so no real call was seen
+    "opencode": '{"type":"tool_use","part":{"type":"tool","tool":"question"}}',
 }
 # the name each model sees, as the skill's table lists it
 TOOLS = {
@@ -32,11 +34,11 @@ TOOLS = {
     "copilot": "ask_user",
     "grok": "ask_user_question",
     "codex": "request_user_input",
+    "opencode": "question",
 }
 # reported from public sources, not probed here
 REPORTED = {
     "gemini": "ask_user",
-    "opencode": "question",
     "cline": "ask_question",
     "pi": "ask_user_question",
 }
