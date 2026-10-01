@@ -23,4 +23,4 @@ leakscan:
 
 # live, costs a model call per harness; exit codes in scripts/probe.sh
 probe:
-	-for h in claude cursor agy copilot grok codex; do bash scripts/probe.sh $$h; done
+	-for h in claude cursor agy copilot grok codex opencode; do bash scripts/probe.sh $$h; done
