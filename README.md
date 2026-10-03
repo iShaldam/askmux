@@ -87,6 +87,7 @@ saves that model as your default; the probe puts your config back after.
 ```
 make check      # manifest validation, tests, and a canary that plants bugs
 make leakscan   # run before any push
+make demo-gif   # re-render docs/probe-demo.gif from a fresh opencode probe (needs Pillow)
 ```
 
 MIT licensed.

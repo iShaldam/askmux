@@ -1,4 +1,4 @@
-.PHONY: check test selftest validate leakscan probe matrix watch
+.PHONY: check test selftest validate leakscan probe matrix watch demo-gif
 
 check: validate matrix test selftest
 
@@ -24,3 +24,7 @@ leakscan:
 # live, costs a model call per harness; exit codes in scripts/probe.sh
 probe:
 	-for h in claude cursor agy copilot grok codex opencode; do bash scripts/probe.sh $$h; done
+
+# re-render docs/probe-demo.gif from a real opencode probe (free model, needs Pillow)
+demo-gif:
+	python3 scripts/demo_gif.py
