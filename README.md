@@ -75,6 +75,10 @@ bash scripts/probe.sh --classify cursor < runs/<log>   # re-read a saved run
 make probe                                             # every harness
 ```
 
+![probe.sh on OpenCode: exit 1, the model answers NO_ASK_TOOL](docs/probe-demo.gif)
+
+The gif is a re-render of one real run's output (OpenCode on its free model), not a live recording.
+
 Each probe is one real model call on your account. Cursor's `--model` flag
 saves that model as your default; the probe puts your config back after.
 
