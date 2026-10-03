@@ -1,7 +1,8 @@
 name: matrix watch
 
 # tests on every push; weekly, re-check every cited issue and pinned source
-# line and open an issue when one moved
+# line and open a draft pr that refreshes watch.json when one moved (falls
+# back to an issue if actions can't open prs). the pr body lists what moved
 
 on:
   schedule:
@@ -28,12 +29,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      contents: read
+      contents: write
       issues: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          persist-credentials: false
+          persist-credentials: true
       - id: check
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -46,7 +48,26 @@ jobs:
       - if: steps.check.outputs.code == '1'
         env:
           GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
+          BASE: ${{ github.event.repository.default_branch }}
         run: |
-          if [ -z "$(gh issue list --state open --search "matrix sources moved in:title" --json number --jq '.[].number')" ]; then
-            gh issue create --title "matrix sources moved" --body-file watch.out
+          if [ -n "$(gh pr list --state open --head watch/refresh --json number --jq '.[].number')" ] \
+             || [ -n "$(gh issue list --state open --search "matrix sources moved in:title" --json number --jq '.[].number')" ]; then
+            exit 0
           fi
+          python3 scripts/watch.py update
+          git config user.name "askmux watch"
+          git config user.email "actions@users.noreply.github.com"
+          git checkout -b watch/refresh
+          git add watch.json
+          git commit -m "watch baseline refreshed, check the matrix rows for the sources below"
+          git push --force origin watch/refresh
+          {
+            echo "These cited sources moved. Review the matching MATRIX.md rows before merging; merging only moves the baseline."
+            echo
+            echo '```'
+            cat watch.out
+            echo '```'
+          } > pr.md
+          gh pr create --draft --base "$BASE" --title "matrix sources moved" --body-file pr.md \
+            || gh issue create --title "matrix sources moved" --body-file watch.out
