@@ -62,6 +62,20 @@ the mode comes from the flag. Plain-text mentions ("No AskQuestion tool")
 turn up in Grok's thinking stream, so only the `askQuestionToolCall` event
 counts as a call.
 
+Cursor confirmed both findings on
+[their forum](https://forum.cursor.com/t/cursor-agent-p-askquestion-is-auto-skipped-in-headless-mode-and-only-some-models-get-the-tool/173657)
+(2026-10-03). In `-p` there's no one to answer, so the CLI rejects every
+`askQuestionInteractionQuery` on its own, with the same wording as a real
+skip. A caller should read any reject there as "never shown". They're passing
+the "no user attached" distinction to the team. The model gating is
+intentional: some models, including the Grok 4.5 family, are set up to ask
+in plain text instead, and Auto can route to one of them. For a script that
+needs an answer, Cursor suggests telling the agent to write the question as
+plain text and stop, then replying with
+`cursor-agent -p --resume <session_id> "<answer>"`, using the `session_id`
+from the stream-json output. The ACP method `cursor/ask_question` is meant to
+be the answerable path, but ACP sessions don't get the tool yet.
+
 **Antigravity doesn't label the call.** Its stream-json logs a tool as
 `"step_type":"tool"` with a `tool_name` (a control run that listed files
 showed `view_file` and `run_command` that way). The ask run instead has one
