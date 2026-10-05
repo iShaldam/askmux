@@ -192,6 +192,23 @@ def fake_run(tmp, cli, body, *args, **env):
                           env=env, text=True, capture_output=True)
 
 
+def stub_bin(tmp, *scripts):
+    # PATH = only this bin: our scripts plus symlinks to real tools, no timeout*
+    bin_dir = os.path.join(tmp, "bin")
+    os.mkdir(bin_dir)
+    for tool in ("dirname", "mktemp", "mkdir", "date", "rm", "rmdir", "cp",
+                 "sed", "grep", "cat", "tr", "basename", "uname"):
+        src = shutil.which(tool)
+        if src:
+            os.symlink(src, os.path.join(bin_dir, tool))
+    for name, body in scripts:
+        path = os.path.join(bin_dir, name)
+        with open(path, "w") as f:
+            f.write("#!/bin/sh\n" + body)
+        os.chmod(path, 0o755)
+    return bin_dir
+
+
 class Run(unittest.TestCase):
     def test_fake_harness_run(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -201,6 +218,33 @@ class Run(unittest.TestCase):
             self.assertRegex(r.stdout, r"^probe: grok\s+-> 0 \(log: runs/[\w-]+-grok\.jsonl\)\n$")
             (log,) = os.listdir(os.path.join(tmp, "runs"))
             self.assertIn("ask_user_question", read_abs(os.path.join(tmp, "runs", log)))
+
+    def test_gtimeout_when_timeout_missing(self):
+        # stub PATH so only gtimeout exists (macOS homebrew name)
+        with tempfile.TemporaryDirectory() as tmp:
+            shutil.copytree(os.path.join(ROOT, "scripts"), os.path.join(tmp, "scripts"))
+            bin_dir = stub_bin(
+                tmp,
+                ("grok", f"echo '{CALLS['grok']}'\n"),
+                ("gtimeout", 'shift\nexec "$@"\n'),
+            )
+            r = subprocess.run(
+                [shutil.which("bash"), os.path.join(tmp, "scripts", "probe.sh"), "grok"],
+                env=dict(os.environ, PATH=bin_dir),
+                text=True, capture_output=True)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+    def test_missing_timeout_exits_2(self):
+        # stub PATH so neither timeout nor gtimeout exists
+        with tempfile.TemporaryDirectory() as tmp:
+            shutil.copytree(os.path.join(ROOT, "scripts"), os.path.join(tmp, "scripts"))
+            bin_dir = stub_bin(tmp, ("grok", "echo should-not-run\n"))
+            r = subprocess.run(
+                [shutil.which("bash"), os.path.join(tmp, "scripts", "probe.sh"), "grok"],
+                env=dict(os.environ, PATH=bin_dir),
+                text=True, capture_output=True)
+            self.assertEqual(r.returncode, 2, r.stdout + r.stderr)
+            self.assertIn("probe: needs timeout (macOS: brew install coreutils)", r.stderr)
 
     def test_cursor_default_model_survives(self):
         # cursor-agent --model saves that model as the user's default
