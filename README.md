@@ -81,6 +81,7 @@ The gif is a re-render of one real run's output (OpenCode on its free model), no
 
 Each probe is one real model call on your account. Cursor's `--model` flag
 saves that model as your default; the probe puts your config back after.
+macOS users need `brew install coreutils` (for `gtimeout`).
 
 ## development
 

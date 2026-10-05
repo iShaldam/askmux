@@ -77,9 +77,14 @@ case "$h" in
             in=/dev/null ;;  # it waits on stdin when not a tty and the run hangs
 esac
 command -v "${cmd[0]}" >/dev/null || { echo "probe: $h -> 2 (${cmd[0]} not installed)"; exit 2; }
+# macOS ships neither; brew coreutils installs gtimeout
+if command -v timeout >/dev/null; then to=timeout
+elif command -v gtimeout >/dev/null; then to=gtimeout
+else echo "probe: needs timeout (macOS: brew install coreutils)" >&2; exit 2
+fi
 mkdir -p "$root/runs"
 log="$root/runs/$(date +%Y%m%d-%H%M%S)-$h.jsonl"
-(cd "$w" && timeout "${PROBE_TIMEOUT:-150}" "${cmd[@]}" "$@") < "$in" > "$log" 2>&1
+(cd "$w" && "$to" "${PROBE_TIMEOUT:-150}" "${cmd[@]}" "$@") < "$in" > "$log" 2>&1
 rc=$?
 [ $rc = 124 ] || { classify "$h" < "$log"; rc=$?; }
 echo "probe: $h $* -> $rc (log: ${log#"$root"/})"
