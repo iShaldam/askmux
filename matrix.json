@@ -329,7 +329,7 @@
       "model": "—",
       "result": "offered to the main agent, not subagents",
       "unanswered": "unknown",
-      "evidence": "reported, [source](https://github.com/openai/codex/blob/0fbf0bedc25d0effec4b758030772468339d315c/codex-rs/core/src/tools/spec_plan.rs#L1178-L1193)",
+      "evidence": "reported, [source](https://github.com/openai/codex/blob/83086188ae0614bd882818ff1aa23f3194962012/codex-rs/core/src/tools/spec_plan.rs#L1340-L1357)",
       "date": "2026-09-25",
       "cli_version": null
     },
