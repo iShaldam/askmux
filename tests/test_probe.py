@@ -400,6 +400,21 @@ class Watch(unittest.TestCase):
         self.assertTrue(watch.code_moved(pinned, "first\nthree\nsecond"))
         self.assertTrue(watch.code_moved(pinned, "first\nthree"))
 
+    def test_head_ref_prefers_latest_release(self):
+        real = watch.fetch
+        watch._refs.clear()
+        try:
+            watch.fetch = lambda url, token: '{"tag_name": "v2.0"}'
+            self.assertEqual(watch.head_ref("acme/app", None), "v2.0")
+
+            def no_release(url, token):
+                raise watch.urllib.error.HTTPError(url, 404, "nope", {}, None)
+            watch.fetch = no_release
+            self.assertEqual(watch.head_ref("acme/other", None), "HEAD")
+        finally:
+            watch.fetch = real
+            watch._refs.clear()
+
     def test_diff_reports_changes(self):
         baseline = {"a": "open", "b": "same", "d": "gone"}
         current = {"a": "closed", "b": "same", "c": "moved"}

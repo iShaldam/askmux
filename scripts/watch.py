@@ -57,6 +57,23 @@ def fetch(url, token):
         return response.read().decode()
 
 
+_refs = {}
+
+
+def head_ref(repo, token):
+    # the matrix tracks what ships, so compare against the latest release tag.
+    # default branches get rewrites that never reach a release (opencode dev)
+    if repo not in _refs:
+        try:
+            release = json.loads(fetch(f"https://api.github.com/repos/{repo}/releases/latest", token))
+            _refs[repo] = release["tag_name"]
+        except urllib.error.HTTPError as error:
+            if error.code != 404:
+                raise
+            _refs[repo] = "HEAD"
+    return _refs[repo]
+
+
 def state(link, token):
     if link["kind"] == "issue":
         url = f"https://api.github.com/repos/{link['repo']}/issues/{link['number']}"
@@ -64,7 +81,7 @@ def state(link, token):
     base = f"https://raw.githubusercontent.com/{link['repo']}"
     pinned = fetch(f"{base}/{link['sha']}/{link['path']}", token)
     try:
-        head = fetch(f"{base}/HEAD/{link['path']}", token)
+        head = fetch(f"{base}/{head_ref(link['repo'], token)}/{link['path']}", token)
     except urllib.error.HTTPError as error:
         if error.code == 404:
             return "gone"
