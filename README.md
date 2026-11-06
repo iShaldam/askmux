@@ -2,14 +2,24 @@
 
 Your skill says "ask me", and half your coding agents have no tool to ask with. askmux is one skill that tells the model which question tool its harness has, plus a tested matrix of who offers one, by mode and model.
 
-Install in Claude Code:
+14 harnesses, last re-checked 2026-11-05: six by a live probe, the rest from their source code, pinned to the line.
+
+## install
+
+Any harness, with the [skills CLI](https://github.com/vercel-labs/skills) (needs Node 22.20+):
+
+```
+npx skills add iShaldam/askmux
+```
+
+Claude Code, as a plugin:
 
 ```
 /plugin marketplace add iShaldam/askmux
 /plugin install askmux@askmux
 ```
 
-Other harnesses: copy `skills/askmux/` into that harness's skills folder (Cursor: `~/.cursor/skills/`).
+Or copy `skills/askmux/` into your harness's skills folder by hand.
 
 <!-- matrix:start -->
 | harness | tool | interactive | headless | notes |
@@ -32,38 +42,47 @@ Other harnesses: copy `skills/askmux/` into that harness's skills folder (Cursor
 
 ✓ offered and answered · ✗ not offered · ~ offered, but nobody answers or the call can't be proven
 
-[MATRIX.md](MATRIX.md) has every run: mode, model, result, and where the evidence comes from.
+No native tool found in Amp, Goose, Windsurf / Devin for Terminal, Junie or Augment (checked 2026-11-05). Warp and Factory Droid have one, but I couldn't confirm its name, so they aren't rows yet.
 
-Every harness has its own tool for asking you a multiple-choice question:
-`AskUserQuestion` in Claude Code, `AskQuestion` in Cursor, `ask_question` in
-Antigravity, `request_user_input` in Codex, `ask_user` in Copilot CLI,
-`ask_user_question` in Grok CLI. Whether the model actually gets it depends
-on the harness, the mode, and sometimes the model. A skill that just says
-"use your question tool" breaks the moment the tool isn't there, and the
-model either invents a name or pretends it asked.
+[MATRIX.md](MATRIX.md) has every run: mode, model, result, what happens when nobody answers, and where the evidence comes from.
 
 ## what it does
 
+Every harness names its tool differently, and whether the model actually gets it depends on the harness, the mode, and sometimes the model. A skill that just says "use your question tool" breaks the moment the tool isn't there, and the model either invents a name or pretends it asked.
+
 The skill tells the model:
 
-1. which tool its harness has, from a table, so it never guesses a name,
-2. what to do when the tool is missing: in a headless run, take the
-   recommended option and say so in one line; otherwise ask once in plain
-   text with lettered options,
-3. how to write the question: 2 to 4 options, the recommended one first,
-   each saying what that choice costs.
+1. which tool its harness has, from the table above, so it never guesses a name,
+2. what to do when the tool is missing: in a headless run, take the recommended option and say so in one line; otherwise ask once in plain text with lettered options,
+3. what to do when the tool is there but nobody answers (skipped, empty, "no operator"): treat it as headless,
+4. how to shape the call for that tool (Codex wants 2 or 3 options, Crush wants a type per question, Zed needs `allow_free_text` for typed answers),
+5. how to write the options so people don't end up typing their own.
 
-It picks one of two modes from context. **Requirements** ("ask me what you
-need") asks only what changes what gets built, 4 questions at most.
-**Study** ("quiz me on this") asks one question at a time, says right or
-wrong with a one-line why, and scores you at the end.
+It picks one of two modes from context. **Requirements** ("ask me what you need") asks only what changes what gets built, 4 questions at most. **Study** ("quiz me on this") asks one question at a time, says right or wrong with a one-line why, and scores you at the end.
+
+## what 2,119 real questions taught it
+
+I counted every `AskUserQuestion` call in my own Claude Code sessions over 45 days: 2,119 calls, 3,476 answered questions.
+
+| options offered | picked the first | typed their own | picked the last |
+|---|---|---|---|
+| 2 | 66% | 23% | 10% |
+| 3 | 56% | 27% | 4% |
+| 4 | 36% | 41% | 2% |
+
+A fourth option almost never wins, and four-option questions got the most typed-in answers. Nearly half of my typed answers were "both", "check it yourself first" or "you do it". So the skill asks for three options, a "both" or multi-select when two can happen together, and a lookup before any question about a fact. That's one heavy user, so read it as a lead, not a law.
+
+## no tool, or nobody there
+
+- Claude Code headless: the Agent SDK gets the tool with a permission handler, and a `PreToolUse` hook can answer it by returning `updatedInput` ([changelog](https://github.com/anthropics/claude-code/blob/646b74189c735abbccf78ef5cb7ddd38a07a36eb/CHANGELOG.md#L7392)).
+- Cursor headless: Cursor suggests having the agent write the question as plain text and stop, then answering with `cursor-agent -p --resume <session_id> "<answer>"` ([forum](https://forum.cursor.com/t/cursor-agent-p-askquestion-is-auto-skipped-in-headless-mode-and-only-some-models-get-the-tool/173657)).
+- No native tool at all: an MCP server can stand in. [mcp-feedback-enhanced](https://github.com/Minidoracat/mcp-feedback-enhanced) opens a feedback UI from any MCP client, and a harness that renders MCP elicitation forms, like Copilot CLI, can ask through one.
+
+askmux stays a skill: no server, nothing to run.
 
 ## the probe
 
-`scripts/probe.sh <harness> [cli args]` runs one harness headless in a temp
-folder with a prompt that asks for a multiple-choice question without naming
-the tool. Finding it is the test. The log goes to `runs/` (gitignored) and
-the exit code is the result:
+`scripts/probe.sh <harness> [cli args]` runs one harness headless in a temp folder with a prompt that asks for a multiple-choice question without naming the tool. Finding it is the test. The log goes to `runs/` (gitignored) and the exit code is the result:
 
 | exit | meaning |
 |---|---|
@@ -83,9 +102,11 @@ make probe                                             # every harness
 
 The gif is a re-render of one real run's output (OpenCode on its free model), not a live recording.
 
-Each probe is one real model call on your account. Cursor's `--model` flag
-saves that model as your default; the probe puts your config back after.
-macOS users need `brew install coreutils` (for `gtimeout`).
+Each probe is one real model call on your account. Cursor's `--model` flag saves that model as your default; the probe puts your config back after. macOS users need `brew install coreutils` (for `gtimeout`).
+
+## keeping it current
+
+A weekly Action re-checks every cited issue and pinned source line. When one moves, it opens a draft PR that refreshes the baseline and lists what moved, so the matching rows get a look before the merge. `make watch` runs the same check locally. If your harness changed, the [issue template](.github/ISSUE_TEMPLATE/harness-changed.md) asks for the version and a probe log.
 
 ## development
 
