@@ -28,7 +28,7 @@ plant "cursor matches thinking"   's/"askQuestionToolCall":/[Aa]sk[Qq]uestion/'
 plant "codex matches prose"       's|"method":"item/tool/requestUserInput"|request_user_input|'
 plant "summary dumps the log"     's/local log; log=/log=/'
 hook=hooks/ask_check.py
-plant "repeat check dropped"      's/if n and n in done:/if False:/' $hook
+plant "repeat check dropped"      's/if n and hit:/if False:/' $hook
 plant "re-asking escape ignored"  's/^        if REASK.search(text):/        if False:/' $hook
 plant "restated question missed"  's/n == d or len(d) >= MIN_CONTAINED and d in n/n == d/' $hook
 plant "question not normalized"   's/^    return " ".join(re.sub.*/    return str(s or "")/' $hook
