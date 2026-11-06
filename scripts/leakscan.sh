@@ -18,7 +18,7 @@ if [ "${1:-}" = "--selftest" ]; then
   echo "leakscan selftest: caught planted leaks"; rm -rf "$t"; exit 0
 fi
 cd "$here/.."
-generic='/Users/[A-Za-z]|/home/[a-z]+/|BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{20}|sk-[A-Za-z0-9-]{20}|AKIA[0-9A-Z]{16}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+generic='/Users/[A-Za-z]|/home/[a-z]+/|BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{20}|(^|[^A-Za-z0-9])sk-[A-Za-z0-9-]{20}|AKIA[0-9A-Z]{16}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 private="${LEAKSCAN_PATTERNS:-$HOME/.config/leakscan/patterns.txt}"
 pats="$generic"
 if [ -f "$private" ]; then
