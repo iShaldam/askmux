@@ -58,6 +58,8 @@ The skill tells the model:
 4. how to shape the call for that tool (Codex wants 2 or 3 options, Crush wants a type per question, Zed needs `allow_free_text` for typed answers),
 5. how to write the options so people don't end up typing their own.
 
+On Claude Code the plugin also checks each question before it's asked ([below](#the-ask-check-hook-claude-code)).
+
 It picks one of two modes from context. **Requirements** ("ask me what you need") asks only what changes what gets built, 4 questions at most. **Study** ("quiz me on this") asks one question at a time, says right or wrong with a one-line why, and scores you at the end.
 
 ## what 2,119 real questions taught it
@@ -72,13 +74,30 @@ I counted every `AskUserQuestion` call in my own Claude Code sessions over 45 da
 
 A fourth option almost never wins, and four-option questions got the most typed-in answers. Nearly half of my typed answers were "both", "check it yourself first" or "you do it". So the skill asks for three options, a "both" or multi-select when two can happen together, and a lookup before any question about a fact. That's one heavy user, so read it as a lead, not a law.
 
+## the ask-check hook (Claude Code)
+
+The Claude Code plugin also adds a `PreToolUse` hook on `AskUserQuestion`. It blocks one thing: a question the user already answered earlier in the same session, either word for word or restated inside a longer one. The call is denied and the model gets the earlier answer back, so it uses it instead of asking twice. Put "re-asking because <what changed>" in the question to get past it.
+
+Everything else is a warning the model reads, never a block:
+
+- "(Recommended)" on an option that isn't first
+- four options (see the table above)
+- a "which" or "or" choice with no "both" option and no multi-select
+- a question about a fact with no "check it first" option
+- an option that's the user's manual step, with no "agent does it" option
+- an option preview holding more than 80 characters the question doesn't, since not every surface shows previews
+
+It's stdlib Python with a 5-second timeout, and any error means silence, so it never stops a question by accident. It reads the session's own transcript and stores nothing.
+
+Turn it off with `ASKMUX_CHECK=off` in your environment, or install the skill alone with `npx skills add`, which brings no hook.
+
 ## no tool, or nobody there
 
 - Claude Code headless: the Agent SDK gets the tool with a permission handler, and a `PreToolUse` hook can answer it by returning `updatedInput` ([changelog](https://github.com/anthropics/claude-code/blob/646b74189c735abbccf78ef5cb7ddd38a07a36eb/CHANGELOG.md#L7392)).
 - Cursor headless: Cursor suggests having the agent write the question as plain text and stop, then answering with `cursor-agent -p --resume <session_id> "<answer>"` ([forum](https://forum.cursor.com/t/cursor-agent-p-askquestion-is-auto-skipped-in-headless-mode-and-only-some-models-get-the-tool/173657)).
 - No native tool at all: an MCP server can stand in. [mcp-feedback-enhanced](https://github.com/Minidoracat/mcp-feedback-enhanced) opens a feedback UI from any MCP client, and a harness that renders MCP elicitation forms, like Copilot CLI, can ask through one.
 
-askmux stays a skill: no server, nothing to run.
+askmux stays a skill, plus one optional hook on Claude Code: no server, nothing to run.
 
 ## the probe
 
