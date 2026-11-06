@@ -16,27 +16,28 @@ know. Evidence:
   - `n/a` (tool not offered)
   - `unknown` (not measured yet)
 
-A weekly Action re-checks every cited issue and pinned source line and opens an issue when one moves; `make watch` runs it locally.
+A weekly Action re-checks every cited issue and pinned source line and opens a draft PR when one moves; `make watch` runs it locally.
 
 <!-- matrix:start -->
 | harness | tool | surface / mode | model | result | unanswered | evidence |
 |---|---|---|---|---|---|---|
 | `claude` | `AskUserQuestion` | desktop app, interactive | claude-opus-5-5 | works | times out: after 60s the tool returns "No response after 60s ... proceed using your best judgment" | manual, 2026-09-25, [anthropics/claude-code#73125](https://github.com/anthropics/claude-code/issues/73125) |
-| `claude` | `AskUserQuestion` | `claude -p` | claude-sonnet-5 | not offered: tool search finds nothing, replies NO_ASK_TOOL | n/a | probe exit 1, 2026-09-25 |
+| `claude` | `AskUserQuestion` | `claude -p` | claude-sonnet-5, claude-opus-5-5 | not offered: tool search finds nothing, replies NO_ASK_TOOL | n/a | probe exit 1, 2026-09-25 and 2026-11-05 (2.1.317) |
 | `claude` | `AskUserQuestion` | `claude -p --permission-mode plan` | claude-sonnet-5 | not offered | n/a | probe exit 1, 2026-09-25 |
 | `claude` | `AskUserQuestion` | Agent SDK, with a permission handler attached | - | offered; plain `-p` hides it since 2.1.187 | unknown | reported, [anthropics/claude-code#77994](https://github.com/anthropics/claude-code/issues/77994) |
+| `claude` | `AskUserQuestion` | Agent SDK, with a PreToolUse hook | - | answerable: the hook collects the answers in its own UI and returns them as `updatedInput` with `permissionDecision: "allow"` | unknown | reported, [CHANGELOG.md](https://github.com/anthropics/claude-code/blob/646b74189c735abbccf78ef5cb7ddd38a07a36eb/CHANGELOG.md#L7392) |
 | `cursor` | `AskQuestion` | IDE agent | varies | works in Plan mode, varies by model | unknown | reported (community), [forum](https://forum.cursor.com/t/allow-askquestion-tool-calls-in-agent-mode-or-any-mode/152517) |
-| `cursor` | `AskQuestion` | `cursor-agent -p` | Grok 4.5 High | not offered (two runs) | n/a | probe exit 1, 2026-09-25 |
+| `cursor` | `AskQuestion` | `cursor-agent -p` | Grok 4.5 High | not offered (two runs) | n/a | probe exit 1, 2026-09-25 and 2026-11-05 (2026.11.05) |
 | `cursor` | `AskQuestion` | `cursor-agent -p --mode plan` | Grok 4.5 High | not offered | n/a | probe exit 1, 2026-09-25 |
 | `cursor` | `AskQuestion` | `cursor-agent -p --model auto` | Auto (routed model not shown) | not offered | n/a | probe exit 1, 2026-09-25 |
-| `cursor` | `AskQuestion` | `cursor-agent -p` | Composer 2.5 | called (`askQuestionToolCall`); headless answers it with "Questions skipped by the user" | skipped | probe exit 0, 2026-09-25 |
+| `cursor` | `AskQuestion` | `cursor-agent -p` | Composer 2.5 | called (`askQuestionToolCall`); headless answers it with "Questions skipped by the user" | skipped | probe exit 0, 2026-09-25 and 2026-11-05 (2026.11.05) |
 | `cursor` | `AskQuestion` | `cursor-agent -p --mode plan` | Composer 2.5 | called | skipped | probe exit 0, 2026-09-25 |
-| `agy` | `ask_question` | `agy -p` | not reported | inconclusive: in the tool list, one unlabelled step ran, and the model says it asked | auto-picks | probe exit 3, 2026-09-25 |
+| `agy` | `ask_question` | `agy -p` | not reported | inconclusive: in the tool list, one unlabelled step ran, and the model says it asked | auto-picks | probe exit 3, 2026-09-25 and 2026-11-05 (1.5.1) |
 | `agy` | `ask_question` | `agy -p --mode plan` | not reported | inconclusive, same pattern | auto-picks | probe exit 3, 2026-09-25 |
 | `agy` | `ask_question` | interactive | - | offered; headless runs settle the choice themselves | unknown | reported, releases [1.2.7](https://github.com/google-antigravity/antigravity-cli/releases/tag/1.2.7), [1.1.12](https://github.com/google-antigravity/antigravity-cli/releases/tag/1.1.12) |
-| `copilot` | `ask_user` | `copilot -p` (1.0.88) | mai-code-1.1-flash | not offered | n/a | probe exit 1, 2026-09-25 |
+| `copilot` | `ask_user` | `copilot -p` | mai-code-1.1-flash, gpt-5.6-luna | not offered | n/a | probe exit 1, 2026-09-25 and 2026-11-05 (1.0.105) |
 | `copilot` | `ask_user` | interactive | - | offered; `--no-ask-user` turns it off | unknown | reported, [CLI reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference), [github/copilot-cli#2929](https://github.com/github/copilot-cli/issues/2929) |
-| `grok` | `ask_user_question` | `grok -p` | grok-4.7 | called | no operator | probe exit 0, 2026-09-25 |
+| `grok` | `ask_user_question` | `grok -p` | grok-4.7 | called | no operator | probe exit 0, 2026-09-25 and 2026-11-05 (1.0.41) |
 | `grok` | `ask_user_question` | interactive | - | offered; in `-p` an unanswered question returns a "no operator" result | unknown | reported, [source](https://github.com/xai-org/grok-build/blob/f0e3be1100ef5252488e3be8bb0e91cf68d8c305/crates/codegen/xai-grok-tools/src/implementations/grok_build/ask_user_question/mod.rs#L101-L105) |
 | `codex` | `request_user_input` | `codex exec` | - | not offered; exec rejects the request as "not supported in exec mode" | n/a | reported, [source](https://github.com/openai/codex/blob/25270df2615eb4da5b9d4a9a392226933fb096c5/codex-rs/exec/src/lib.rs#L2038-L2048) |
 | `codex` | `request_user_input` | TUI, Plan mode | - | offered; Default mode says it's unavailable unless `[features] default_mode_request_user_input = true` (under development, off by default); Default mode auto-resolves after about a minute with an empty answer | blocks | reported, [openai/codex#29104](https://github.com/openai/codex/issues/29104), [#11536](https://github.com/openai/codex/issues/11536), [flag](https://github.com/openai/codex/blob/0fbf0bedc25d0effec4b758030772468339d315c/codex-rs/features/src/lib.rs#L1613-L1618), [openai/codex#34455](https://github.com/openai/codex/issues/34455), [#37472](https://github.com/openai/codex/issues/37472) |
@@ -45,14 +46,35 @@ A weekly Action re-checks every cited issue and pinned source line and opens an 
 | `gemini` | `ask_user` | interactive | - | offered: pauses until answered or dismissed | blocks: waits for an answer; dismissing returns "User dismissed ask_user dialog without answering." | reported, [docs](https://geminicli.com/docs/tools/ask-user/), [ask-user.ts](https://github.com/google-gemini/gemini-cli/blob/40d4dccfa9aec692b27798ca819b918609e2bc60/packages/core/src/tools/ask-user.ts#L190-L193) |
 | `gemini` | `ask_user` | `gemini -p` | - | not offered: excluded when not interactive, and in ACP mode | n/a | reported, [config.ts](https://github.com/google-gemini/gemini-cli/blob/40d4dccfa9aec692b27798ca819b918609e2bc60/packages/cli/src/config/config.ts#L795-L803) |
 | `opencode` | `question` | TUI, or `opencode run --mini` | - | offered, on by default | blocks: no timeout | reported, [docs](https://opencode.ai/docs/tools/#question), [question/index.ts](https://github.com/anomalyco/opencode/blob/2fa3363c924c5c3e367b84a87ae478296a0ed59b/packages/opencode/src/question/index.ts#L96-L107) |
-| `opencode` | `question` | `opencode run` | opencode/big-pickle | not offered: the model replies NO_ASK_TOOL | n/a | probe exit 1, 2026-09-30; reported, [run.ts](https://github.com/anomalyco/opencode/blob/2fa3363c924c5c3e367b84a87ae478296a0ed59b/packages/opencode/src/cli/cmd/run.ts#L430-L437) |
+| `opencode` | `question` | `opencode run` | opencode/big-pickle | not offered: the model replies NO_ASK_TOOL | n/a | probe exit 1, 2026-09-30 and 2026-11-05 (1.18.32); reported, [run.ts](https://github.com/anomalyco/opencode/blob/2fa3363c924c5c3e367b84a87ae478296a0ed59b/packages/opencode/src/cli/cmd/run.ts#L430-L437) |
 | `cline` | `ask_question` | CLI, in a terminal | - | offered and auto-approved | blocks: reads the answer from the terminal, no timeout | reported, [run-agent.ts](https://github.com/cline/cline/blob/fef9de1665d098ef13327656669cc43783151e0b/apps/cli/src/runtime/run-agent.ts#L163-L166), [approval.ts](https://github.com/cline/cline/blob/fef9de1665d098ef13327656669cc43783151e0b/apps/cli/src/utils/approval.ts#L128-L145) |
 | `cline` | `ask_question` | CLI, stdin or stdout not a terminal | - | offered | auto-picks: returns the first option without asking | reported, [approval.ts](https://github.com/cline/cline/blob/fef9de1665d098ef13327656669cc43783151e0b/apps/cli/src/utils/approval.ts#L120-L126) |
 | `pi` | `ask_user_question` | TUI, with the ghoseb/pi-askuserquestion extension | - | not built in; the extension adds it | blocks: waits on the TUI; cancel returns "User cancelled" | reported, [built-in tools](https://github.com/earendil-works/pi/blob/1b347794e2a630e4359f2584f4eea388145d0ddf/packages/coding-agent/src/core/tools/index.ts#L95), [extension](https://github.com/ghoseb/pi-askuserquestion/blob/e58609c9e9c8c4e8a0348c96eaad38dd7e6f0578/src/index.ts#L65-L71) |
 | `pi` | `ask_user_question` | print / JSON mode, with the extension | - | loaded, but returns an error and turns itself off | no operator: error result, and the tool is off for the rest of the session | reported, [extension](https://github.com/ghoseb/pi-askuserquestion/blob/e58609c9e9c8c4e8a0348c96eaad38dd7e6f0578/src/index.ts#L40-L56) |
+| `qwen` | `ask_user_question` | interactive | - | offered; same shape as Claude Code: 2 to 4 options, `multiSelect`, Other added for you | unknown: a dismissed dialog returns "User declined to answer the questions." | reported, [askUserQuestion.ts](https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L63), [declined](https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L264-L269) |
+| `qwen` | `ask_user_question` | `qwen -p`, no ACP host | - | offered, but it can't collect an answer: the call is auto-allowed and returns an error | no operator: "Cannot ask user questions in non-interactive mode without ACP support" | reported, [canCollectAnswers](https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L181-L190), [error](https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L253-L262) |
+| `crush` | `question` | interactive | - | offered; typed questions: `yes_no`, `single_choice`, `multi_choice`, `free_text` | unknown: a skipped question returns "User skipped this question" | reported, [question.go](https://github.com/charmbracelet/crush/blob/66b433f7865a9521f0df284f8b5b3ffa2f6c2d00/internal/agent/tools/question.go#L15), [skipped](https://github.com/charmbracelet/crush/blob/66b433f7865a9521f0df284f8b5b3ffa2f6c2d00/internal/agent/tools/question.go#L195) |
+| `crush` | `question` | non-interactive, and subagents | - | not offered: dropped from the tool list | n/a | reported, [coordinator.go](https://github.com/charmbracelet/crush/blob/938fef205ca1ba6a35d5ff9f93e69b5c31d41a83/internal/agent/coordinator.go#L960-L969) |
+| `zed` | `ask_user` | agent panel, a profile with `ask_user` on | - | offered; needs 2+ `options` or `allow_free_text: true` | unknown | reported, [ask_user_tool.rs](https://github.com/zed-industries/zed/blob/4ec98df5000b21dca9aa1a064d770fb6ebc63880/crates/agent/src/tools/ask_user_tool.rs#L27-L32), [name](https://github.com/zed-industries/zed/blob/4ec98df5000b21dca9aa1a064d770fb6ebc63880/crates/agent/src/tools/ask_user_tool.rs#L75) |
+| `zed` | `ask_user` | agent panel, built-in Write and Ask profiles | - | not offered: both default profiles set `"ask_user": false` | n/a | reported, [write profile](https://github.com/zed-industries/zed/blob/4ec98df5000b21dca9aa1a064d770fb6ebc63880/assets/settings/default.json#L1310), [ask profile](https://github.com/zed-industries/zed/blob/4ec98df5000b21dca9aa1a064d770fb6ebc63880/assets/settings/default.json#L1340) |
+| `kilo` | `question` | Kilo CLI TUI | - | offered; OpenCode's `question` tool, forked | unknown: an empty answer comes back as "Unanswered" | reported, [question.ts](https://github.com/Kilo-Org/kilocode/blob/fd8818e48c055515752955c75624616e3e2c63cb/packages/opencode/src/tool/question.ts#L17), [Unanswered](https://github.com/Kilo-Org/kilocode/blob/fd8818e48c055515752955c75624616e3e2c63cb/packages/opencode/src/tool/question.ts#L40) |
+| `kilo` | `question` | `kilo run` | - | not offered: non-interactive runs deny the `question` permission | n/a | reported, [run.ts](https://github.com/Kilo-Org/kilocode/blob/2129ab225718a99ba12f0a0442699f3fde891bd0/packages/opencode/src/cli/cmd/run.ts#L481-L487) |
 <!-- matrix:end -->
 
 ## notes
+
+**Re-checked 2026-11-05.** The six installed CLIs gave the same results as in
+September on their current versions (Claude Code 2.1.317, cursor-agent
+2026.11.05, Antigravity 1.5.1, Copilot CLI 1.0.105, Grok CLI 1.0.41, OpenCode
+1.18.32), and every pinned source line was unchanged. Qwen Code, Crush, Zed
+and Kilo CLI are new rows, read from source: none of them is installed here,
+so none is probed.
+
+**No native tool found** in Amp, Goose, Windsurf / Devin for Terminal, Junie
+or Augment (their docs and source, 2026-11-05). Warp shows "agent questions"
+and Factory Droid has an `AskUser` tool, but neither name is confirmed for the
+CLI, so they wait for a probe. Roo Code is archived.
+
 
 **Cursor is model-gated.** The same headless command gets the tool on
 Composer 2.5 and not on Grok 4.5 High, in both default and plan mode. Auto

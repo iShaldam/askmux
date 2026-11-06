@@ -41,6 +41,10 @@ REPORTED = {
     "gemini": "ask_user",
     "cline": "ask_question",
     "pi": "ask_user_question",
+    "qwen": "ask_user_question",
+    "crush": "question",
+    "zed": "ask_user",
+    "kilo": "question",
 }
 UNANSWERED = ("blocks", "times out", "skipped", "no operator", "auto-picks",
               "n/a", "unknown")

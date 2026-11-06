@@ -1,8 +1,19 @@
 {
+  "https://github.com/Kilo-Org/kilocode/blob/2129ab225718a99ba12f0a0442699f3fde891bd0/packages/opencode/src/cli/cmd/run.ts#L481-L487": "same",
+  "https://github.com/Kilo-Org/kilocode/blob/fd8818e48c055515752955c75624616e3e2c63cb/packages/opencode/src/tool/question.ts#L17": "same",
+  "https://github.com/Kilo-Org/kilocode/blob/fd8818e48c055515752955c75624616e3e2c63cb/packages/opencode/src/tool/question.ts#L40": "same",
+  "https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L181-L190": "same",
+  "https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L253-L262": "same",
+  "https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L264-L269": "same",
+  "https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L63": "same",
   "https://github.com/anomalyco/opencode/blob/2fa3363c924c5c3e367b84a87ae478296a0ed59b/packages/opencode/src/cli/cmd/run.ts#L430-L437": "same",
   "https://github.com/anomalyco/opencode/blob/2fa3363c924c5c3e367b84a87ae478296a0ed59b/packages/opencode/src/question/index.ts#L96-L107": "same",
+  "https://github.com/anthropics/claude-code/blob/646b74189c735abbccf78ef5cb7ddd38a07a36eb/CHANGELOG.md#L7392": "same",
   "https://github.com/anthropics/claude-code/issues/73125": "closed",
   "https://github.com/anthropics/claude-code/issues/77994": "closed",
+  "https://github.com/charmbracelet/crush/blob/66b433f7865a9521f0df284f8b5b3ffa2f6c2d00/internal/agent/tools/question.go#L15": "same",
+  "https://github.com/charmbracelet/crush/blob/66b433f7865a9521f0df284f8b5b3ffa2f6c2d00/internal/agent/tools/question.go#L195": "same",
+  "https://github.com/charmbracelet/crush/blob/938fef205ca1ba6a35d5ff9f93e69b5c31d41a83/internal/agent/coordinator.go#L960-L969": "same",
   "https://github.com/cline/cline/blob/fef9de1665d098ef13327656669cc43783151e0b/apps/cli/src/runtime/run-agent.ts#L163-L166": "same",
   "https://github.com/cline/cline/blob/fef9de1665d098ef13327656669cc43783151e0b/apps/cli/src/utils/approval.ts#L120-L126": "same",
   "https://github.com/cline/cline/blob/fef9de1665d098ef13327656669cc43783151e0b/apps/cli/src/utils/approval.ts#L128-L145": "same",
@@ -20,5 +31,9 @@
   "https://github.com/openai/codex/issues/29104": "open",
   "https://github.com/openai/codex/issues/34455": "open",
   "https://github.com/openai/codex/issues/37472": "open",
-  "https://github.com/xai-org/grok-build/blob/f0e3be1100ef5252488e3be8bb0e91cf68d8c305/crates/codegen/xai-grok-tools/src/implementations/grok_build/ask_user_question/mod.rs#L101-L105": "same"
+  "https://github.com/xai-org/grok-build/blob/f0e3be1100ef5252488e3be8bb0e91cf68d8c305/crates/codegen/xai-grok-tools/src/implementations/grok_build/ask_user_question/mod.rs#L101-L105": "same",
+  "https://github.com/zed-industries/zed/blob/4ec98df5000b21dca9aa1a064d770fb6ebc63880/assets/settings/default.json#L1310": "same",
+  "https://github.com/zed-industries/zed/blob/4ec98df5000b21dca9aa1a064d770fb6ebc63880/assets/settings/default.json#L1340": "same",
+  "https://github.com/zed-industries/zed/blob/4ec98df5000b21dca9aa1a064d770fb6ebc63880/crates/agent/src/tools/ask_user_tool.rs#L27-L32": "same",
+  "https://github.com/zed-industries/zed/blob/4ec98df5000b21dca9aa1a064d770fb6ebc63880/crates/agent/src/tools/ask_user_tool.rs#L75": "same"
 }
