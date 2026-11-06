@@ -28,6 +28,10 @@ question tool; never invent a tool name.
 | OpenCode | `question` | on by default in the TUI and `opencode run --mini`; plain `opencode run` denies it |
 | Cline | `ask_question` | CLI, interactive; with no terminal it picks the first option for you |
 | pi | `ask_user_question` | not built in; the ghoseb/pi-askuserquestion extension adds it, interactive only |
+| Qwen Code | `ask_user_question` | interactive; `qwen -p` with no ACP host returns an error instead of asking |
+| Crush | `question` | interactive only; typed questions (yes/no, single, multi, free text) |
+| Zed | `ask_user` | agent panel, only in a profile that turns `ask_user` on (off in Write and Ask) |
+| Kilo CLI | `question` | TUI; `kilo run` denies it |
 <!-- matrix:end -->
 
 [MATRIX.md](https://github.com/iShaldam/askmux/blob/main/MATRIX.md) has the tested detail per mode and model.

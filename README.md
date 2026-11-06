@@ -14,7 +14,7 @@ Other harnesses: copy `skills/askmux/` into that harness's skills folder (Cursor
 <!-- matrix:start -->
 | harness | tool | interactive | headless | notes |
 |---|---|---|---|---|
-| Claude Code | `AskUserQuestion` | ✓ | ✗ `claude -p` | ✓ in the Agent SDK with a permission handler |
+| Claude Code | `AskUserQuestion` | ✓ | ✗ `claude -p` | ✓ in the Agent SDK with a permission handler, or a PreToolUse hook that answers it |
 | Cursor | `AskQuestion` | ✓ model-gated | ~ Composer 2.5 calls it, the answer comes back "skipped" | ✗ on Grok 4.5 High and Auto, both modes |
 | Antigravity | `ask_question` | ✓ | ~ listed, the call can't be proven | headless picks for you |
 | Codex | `request_user_input` | ✓ Plan mode only | ✗ `codex exec` | Default mode needs the `default_mode_request_user_input` feature; some models get `request_user_input_async` |
@@ -24,6 +24,10 @@ Other harnesses: copy `skills/askmux/` into that harness's skills folder (Cursor
 | OpenCode | `question` | ✓ | ✗ `opencode run` denies it | `--mini` allows it; `"permission": {"question": "deny"}` turns it off |
 | Cline | `ask_question` | ✓ | ~ offered, picks the first option | older builds and the VS Code extension call it `ask_followup_question` |
 | pi | `ask_user_question` | ~ extension only | ✗ print / JSON mode | same tool name as Grok CLI |
+| Qwen Code | `ask_user_question` | ✓ | ~ `qwen -p` errors without an ACP host | same tool name as Grok CLI and pi |
+| Crush | `question` | ✓ | ✗ dropped when not interactive | same tool name as OpenCode, different schema |
+| Zed | `ask_user` | ~ off in the default profiles | ✗ editor only | needs 2+ options or `allow_free_text` |
+| Kilo CLI | `question` | ✓ | ✗ `kilo run` denies it | OpenCode fork; the VS Code extension uses `ask_followup_question` |
 <!-- matrix:end -->
 
 ✓ offered and answered · ✗ not offered · ~ offered, but nobody answers or the call can't be proven
