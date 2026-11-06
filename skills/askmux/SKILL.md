@@ -4,8 +4,8 @@ description: >-
   Use when you need decisions from the user before starting work, or when the
   user says "quiz me", "ask me what you need", or wants options to pick from.
   Asks multiple-choice questions through the host harness's native question
-  tool (Claude Code, Cursor, Antigravity, Codex, Copilot CLI, Grok CLI), with
-  a fallback when the tool is missing.
+  tool (Claude Code, Cursor, Codex, Copilot CLI, Gemini CLI, OpenCode, Qwen
+  Code and more), with a fallback when the tool is missing.
 ---
 
 # askmux
@@ -39,8 +39,9 @@ question tool; never invent a tool name.
 ## If the tool is missing
 
 1. Check your tool list once. If your harness defers tools behind a tool
-   search, search the name before deciding it's missing. If it isn't there,
-   don't pretend it is.
+   search, search the name before deciding it's missing (Cursor: look it up
+   with `GetDynamicTools` and call it through `CallDynamicTool`, namespace
+   `cursor`). If it isn't there, don't pretend it is.
 2. Headless run (no one watching)? Don't ask. Take the recommended option,
    say so in one line, and keep going.
 3. Otherwise say in one line what's missing and how to get it (Codex: switch
@@ -67,13 +68,31 @@ questions, one round. A second round only if an answer opened a real fork.
 one line why. Score at the end. One question at a time; stop when they stop.
 Only quiz what they read or decided, never internals they never saw.
 
+## Match the tool's shape
+
+The tools differ. Codex wants 2 or 3 options and adds "Other" itself;
+Claude Code and Qwen Code take 2 to 4 and add "Other"; Crush needs a `type`
+per question (`yes_no`, `single_choice`, `multi_choice`, `free_text`); Zed
+needs 2+ options or `allow_free_text: true`. Read the tool's own schema
+before the first call.
+
 ## Writing options
 
-- 2 to 4 options that lead to genuinely different outcomes.
+- 2 to 4 options that lead to genuinely different outcomes. Three is
+  usually right: in 2,119 real Claude Code calls a fourth option was picked
+  2.3% of the time, and four-option questions got the most typed-in
+  answers (41%).
 - Labels 5 words or fewer. Put `(Recommended)` on the one you'd pick, first.
 - Each description says what that choice costs: the trade-off, not a
   restatement of the label.
 - Don't make one option obviously right in requirements mode.
+- Cover what people end up typing (30% of answers in those calls were
+  typed): if two options could both happen, add "both" or allow
+  multi-select; if an agent could do the user's step, offer that.
+- A fact you could look up isn't a question. Look first; if you can't, offer
+  "check X first".
+- Anything they must read or approve (a draft, a diff) goes in the question
+  text, not an option preview: not every surface shows previews.
 
 ## Don't
 
