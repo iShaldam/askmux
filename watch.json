@@ -3,7 +3,7 @@
   "https://github.com/Kilo-Org/kilocode/blob/fd8818e48c055515752955c75624616e3e2c63cb/packages/opencode/src/tool/question.ts#L17": "same",
   "https://github.com/Kilo-Org/kilocode/blob/fd8818e48c055515752955c75624616e3e2c63cb/packages/opencode/src/tool/question.ts#L40": "same",
   "https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L181-L190": "same",
-  "https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L253-L262": "same",
+  "https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L253-L262": "moved",
   "https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L264-L269": "same",
   "https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L63": "same",
   "https://github.com/anomalyco/opencode/blob/2fa3363c924c5c3e367b84a87ae478296a0ed59b/packages/opencode/src/cli/cmd/run.ts#L430-L437": "same",
