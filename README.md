@@ -6,7 +6,7 @@ Your skill says "ask me", and half your coding agents have no tool to ask with. 
 
 ## install
 
-Any harness, with the [skills CLI](https://github.com/vercel-labs/skills) (needs Node 22.20+):
+Any harness, with the [skills CLI](https://github.com/vercel-labs/skills) (needs Node 22.20+; CI installs it this way on every push):
 
 ```
 npx skills add iShaldam/askmux
