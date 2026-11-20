@@ -238,7 +238,7 @@ class Run(unittest.TestCase):
                 text=True, capture_output=True)
             self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
 
-    def test_missing_timeout_exits_2(self):
+    def test_missing_timeout_exits_4(self):
         # stub PATH so neither timeout nor gtimeout exists
         with tempfile.TemporaryDirectory() as tmp:
             shutil.copytree(os.path.join(ROOT, "scripts"), os.path.join(tmp, "scripts"))
@@ -247,7 +247,7 @@ class Run(unittest.TestCase):
                 [shutil.which("bash"), os.path.join(tmp, "scripts", "probe.sh"), "grok"],
                 env=dict(os.environ, PATH=bin_dir),
                 text=True, capture_output=True)
-            self.assertEqual(r.returncode, 2, r.stdout + r.stderr)
+            self.assertEqual(r.returncode, 4, r.stdout + r.stderr)
             self.assertIn("probe: needs timeout (macOS: brew install coreutils)", r.stderr)
 
     def test_cursor_default_model_survives(self):
@@ -285,7 +285,7 @@ class Run(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             os.makedirs(os.path.join(tmp, "home", ".cursor", "askmux-probe.lock"))
             r = fake_run(tmp, "cursor-agent", "echo x\n", "cursor", HOME=os.path.join(tmp, "home"))
-            self.assertEqual(r.returncode, 2, r.stdout)
+            self.assertEqual(r.returncode, 4, r.stdout)
             self.assertIn("another cursor probe", r.stdout)
 
 
