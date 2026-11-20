@@ -115,8 +115,10 @@ askmux stays a skill, plus one optional hook on Claude Code: no server, nothing 
 ```
 bash scripts/probe.sh cursor --model composer-2.5
 bash scripts/probe.sh --classify cursor < runs/<log>   # re-read a saved run
-make probe                                             # every harness
+make probe                                             # all 7 harnesses probe.sh knows
 ```
+
+probe.sh knows Claude Code, Cursor, Antigravity, Copilot CLI, Grok CLI, Codex and OpenCode. The other seven rows (Gemini CLI, Qwen Code, Crush, Kilo CLI, Cline, Zed, pi) come from each harness's source code, pinned to the line, until someone adds a probe for them.
 
 ![probe.sh on OpenCode: exit 1, the model answers NO_ASK_TOOL](docs/probe-demo.gif)
 
