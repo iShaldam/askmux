@@ -5,6 +5,7 @@
 #   probe.sh --classify <harness> < log    classify a saved run
 # exit: 0 tool called | 1 model says it has no such tool | 2 cli missing
 #       3 neither (asked in plain text, or the call isn't visible; read the log)
+#       4 can't probe here (no timeout/gtimeout, or another cursor probe is running)
 #       124 timed out
 set -u
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -43,7 +44,7 @@ called "$h" >/dev/null || { echo "probe: unknown harness '$h'"; exit 2; }
 lock="$HOME/.cursor/askmux-probe.lock"
 if [ "$h" = cursor ]; then
   mkdir -p "$HOME/.cursor"
-  mkdir "$lock" 2>/dev/null || { echo "probe: another cursor probe is running (stale? rmdir $lock)"; exit 2; }
+  mkdir "$lock" 2>/dev/null || { echo "probe: another cursor probe is running (stale? rmdir $lock)"; exit 4; }
 fi
 w="$(mktemp -d)"   # run outside the repo so an agent can't touch it
 # cursor-agent --model saves that model as your default; put yours back after.
@@ -80,7 +81,7 @@ command -v "${cmd[0]}" >/dev/null || { echo "probe: $h -> 2 (${cmd[0]} not insta
 # macOS ships neither; brew coreutils installs gtimeout
 if command -v timeout >/dev/null; then to=timeout
 elif command -v gtimeout >/dev/null; then to=gtimeout
-else echo "probe: needs timeout (macOS: brew install coreutils)" >&2; exit 2
+else echo "probe: needs timeout (macOS: brew install coreutils)" >&2; exit 4
 fi
 mkdir -p "$root/runs"
 log="$root/runs/$(date +%Y%m%d-%H%M%S)-$h.jsonl"

@@ -109,6 +109,7 @@ askmux stays a skill, plus one optional hook on Claude Code: no server, nothing 
 | 1 | the model says it has no such tool |
 | 2 | the CLI isn't installed |
 | 3 | neither: it asked in plain text, or the call isn't visible in the log |
+| 4 | can't probe here: no `timeout` or `gtimeout`, or another Cursor probe is running |
 | 124 | timed out |
 
 ```
@@ -121,7 +122,7 @@ make probe                                             # every harness
 
 The gif is a re-render of one real run's output (OpenCode on its free model), not a live recording.
 
-Each probe is one real model call on your account. Cursor's `--model` flag saves that model as your default; the probe puts your config back after. macOS users need `brew install coreutils` (for `gtimeout`).
+Each probe is one real model call on your account. Cursor's `--model` flag saves that model as your default; the probe puts your config back after. macOS ships neither `timeout` nor `gtimeout`, so install them with `brew install coreutils` first (the probe exits 4 without one).
 
 ## keeping it current
 
