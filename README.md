@@ -118,7 +118,7 @@ bash scripts/probe.sh --classify cursor < runs/<log>   # re-read a saved run
 make probe                                             # all 7 harnesses probe.sh knows
 ```
 
-probe.sh knows Claude Code, Cursor, Antigravity, Copilot CLI, Grok CLI, Codex and OpenCode. The other seven rows (Gemini CLI, Qwen Code, Crush, Kilo CLI, Cline, Zed, pi) come from each harness's source code, pinned to the line, until someone adds a probe for them.
+probe.sh knows Claude Code, Cursor, Antigravity, Copilot CLI, Grok CLI, Codex and OpenCode. The other seven rows (Gemini CLI, Qwen Code, Crush, Kilo CLI, Cline, Zed, pi) come from each harness's source code, pinned to the line, until someone adds a probe for them ([CONTRIBUTING](CONTRIBUTING.md) says how).
 
 ![probe.sh on OpenCode: exit 1, the model answers NO_ASK_TOOL](docs/probe-demo.gif)
 
@@ -128,7 +128,7 @@ Each probe is one real model call on your account. Cursor's `--model` flag saves
 
 ## keeping it current
 
-A weekly Action re-checks every cited issue and pinned source line. When one moves, it opens a draft PR that refreshes the baseline and lists what moved, so the matching rows get a look before the merge. `make watch` runs the same check locally. If your harness changed, the [issue template](.github/ISSUE_TEMPLATE/harness-changed.md) asks for the version and a probe log.
+A weekly Action re-checks every cited issue and pinned source line. When one moves, it opens a draft PR that refreshes the baseline and lists what moved, so the matching rows get a look before the merge. `make watch` runs the same check locally. If your harness changed, the [issue template](.github/ISSUE_TEMPLATE/harness-changed.md) asks for the version and a probe log, and [CONTRIBUTING](CONTRIBUTING.md) shows how to send the fixed row as a PR.
 
 ## development
 
