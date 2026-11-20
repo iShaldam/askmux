@@ -21,7 +21,8 @@ selftest:
 leakscan:
 	bash scripts/leakscan.sh
 
-# live, costs a model call per harness; exit codes in scripts/probe.sh
+# live, costs a model call per harness; exit codes in scripts/probe.sh.
+# only the harnesses probe.sh has a pattern for; the other matrix rows are source-checked
 probe:
 	-for h in claude cursor agy copilot grok codex opencode; do bash scripts/probe.sh $$h; done
 
