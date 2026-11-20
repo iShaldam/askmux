@@ -479,7 +479,7 @@
       "model": "-",
       "result": "offered; same shape as Claude Code: 2 to 4 options, `multiSelect`, Other added for you",
       "unanswered": "unknown: a dismissed dialog returns \"User declined to answer the questions.\"",
-      "evidence": "reported, [askUserQuestion.ts](https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L63), [declined](https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L264-L269)",
+      "evidence": "reported, [askUserQuestion.ts](https://github.com/QwenLM/qwen-code/blob/895dfca8ff125ac0e16372edacd4653322c02147/packages/core/src/tools/askUserQuestion.ts#L63), [declined](https://github.com/QwenLM/qwen-code/blob/895dfca8ff125ac0e16372edacd4653322c02147/packages/core/src/tools/askUserQuestion.ts#L264-L269)",
       "date": "2026-11-05",
       "cli_version": "main@2c5250d"
     },
@@ -490,7 +490,7 @@
       "model": "-",
       "result": "offered, but it can't collect an answer: the call is auto-allowed and returns an error",
       "unanswered": "no operator: \"Cannot ask user questions in non-interactive mode without ACP support\"",
-      "evidence": "reported, [canCollectAnswers](https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L181-L190), [error](https://github.com/QwenLM/qwen-code/blob/2c5250daa69db076cca65af0d8f55cf949fb8d84/packages/core/src/tools/askUserQuestion.ts#L253-L262)",
+      "evidence": "reported, [canCollectAnswers](https://github.com/QwenLM/qwen-code/blob/895dfca8ff125ac0e16372edacd4653322c02147/packages/core/src/tools/askUserQuestion.ts#L181-L190), [error](https://github.com/QwenLM/qwen-code/blob/895dfca8ff125ac0e16372edacd4653322c02147/packages/core/src/tools/askUserQuestion.ts#L253-L262)",
       "date": "2026-11-05",
       "cli_version": "main@2c5250d"
     },
