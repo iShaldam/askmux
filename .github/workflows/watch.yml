@@ -1,8 +1,9 @@
 name: matrix watch
 
 # tests on every push; weekly, re-check every cited issue and pinned source
-# line and open a draft pr that refreshes watch.json when one moved (falls
-# back to an issue if actions can't open prs). the pr body lists what moved
+# line. when one moved it tries a draft pr that refreshes watch.json, but this
+# repo doesn't let actions open prs, so today it deletes that branch again and
+# files a "matrix sources moved" issue listing what moved
 
 on:
   schedule:
@@ -69,5 +70,6 @@ jobs:
             cat watch.out
             echo '```'
           } > pr.md
-          gh pr create --draft --base "$BASE" --title "matrix sources moved" --body-file pr.md \
-            || gh issue create --title "matrix sources moved" --body-file watch.out
+          gh pr create --draft --base "$BASE" --title "matrix sources moved" --body-file pr.md && exit 0
+          git push origin --delete watch/refresh || true
+          gh issue create --title "matrix sources moved" --label matrix --body-file watch.out
