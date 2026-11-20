@@ -1,6 +1,6 @@
-.PHONY: check test selftest validate leakscan probe matrix watch demo-gif
+.PHONY: check release test selftest validate leakscan probe matrix watch demo-gif
 
-check: validate matrix test selftest
+check: validate matrix test selftest release
 
 matrix:
 	python3 scripts/matrix.py check
@@ -28,3 +28,6 @@ probe:
 # re-render docs/probe-demo.gif from a real opencode probe (free model, needs Pillow)
 demo-gif:
 	python3 scripts/demo_gif.py
+
+release:
+	sh scripts/release-check.sh
