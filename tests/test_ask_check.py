@@ -1,5 +1,5 @@
 """Synthetic transcripts and payloads only, shaped like Claude Code's real ones."""
-import json, os, subprocess, sys, tempfile, unittest
+import json, os, shutil, subprocess, sys, tempfile, unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -189,6 +189,21 @@ class Safe(Hook):
                            input=json.dumps(payload), env=dict(self.env, CLAUDE_PLUGIN_ROOT=ROOT))
         self.assertEqual(r.returncode, 0)
         self.assertIn("deny", r.stdout)
+
+    def test_hook_command_is_one_plain_path(self):
+        # the plugin directory blocks hook commands with substitutions or inline loops
+        command = pre_tool_use()["hooks"][0]["command"]
+        self.assertEqual(command, '"${CLAUDE_PLUGIN_ROOT}/hooks/run.sh"')
+        self.assertTrue(os.access(os.path.join(ROOT, "hooks", "run.sh"), os.X_OK))
+
+    def test_runner_is_silent_without_python(self):
+        with tempfile.TemporaryDirectory() as bin_dir:
+            for tool in ("cat", "dirname"):
+                os.symlink(shutil.which(tool), os.path.join(bin_dir, tool))
+            r = subprocess.run([shutil.which("sh"), os.path.join(ROOT, "hooks", "run.sh")],
+                               capture_output=True, text=True, input="{}",
+                               env=dict(self.env, PATH=bin_dir))
+        self.assertEqual((r.returncode, r.stdout), (0, ""))
 
     def test_every_hook_has_a_short_timeout(self):
         cmd = pre_tool_use()
