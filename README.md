@@ -6,7 +6,7 @@ Your skill says "ask me", and half your coding agents have no tool to ask with. 
 
 ![the same prompt in Claude Code, which asks through AskUserQuestion, and in OpenCode with its question tool off, which falls back to A/B/C options](docs/ask-demo.gif)
 
-Same prompt, two live terminal recordings on one Mac, sped up 5x. Claude Code asks through `AskUserQuestion`. OpenCode, with `"permission": {"question": "deny"}`, says the tool is missing and asks with lettered options instead.
+Same prompt, two live terminal recordings on one Mac, sped up 5x. Claude Code asks through `AskUserQuestion`. OpenCode, with `"permission": {"question": "deny"}`, asks with lettered options in plain text instead.
 
 ## install
 
