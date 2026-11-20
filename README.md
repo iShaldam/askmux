@@ -4,6 +4,10 @@ Your skill says "ask me", and half your coding agents have no tool to ask with. 
 
 14 harnesses, last re-checked 2026-11-05: six by a live probe, the rest from their source code, pinned to the line.
 
+![the same prompt in Claude Code, which asks through AskUserQuestion, and in OpenCode with its question tool off, which falls back to A/B/C options](docs/ask-demo.gif)
+
+Same prompt, two live terminal recordings on one Mac, sped up 5x. Claude Code asks through `AskUserQuestion`. OpenCode, with `"permission": {"question": "deny"}`, says the tool is missing and asks with lettered options instead.
+
 ## install
 
 Any harness, with the [skills CLI](https://github.com/vercel-labs/skills) (needs Node 22.20+; CI installs it this way on every push):
@@ -119,10 +123,6 @@ make probe                                             # all 7 harnesses probe.s
 ```
 
 probe.sh knows Claude Code, Cursor, Antigravity, Copilot CLI, Grok CLI, Codex and OpenCode. The other seven rows (Gemini CLI, Qwen Code, Crush, Kilo CLI, Cline, Zed, pi) come from each harness's source code, pinned to the line, until someone adds a probe for them ([CONTRIBUTING](CONTRIBUTING.md) says how).
-
-![probe.sh on OpenCode: exit 1, the model answers NO_ASK_TOOL](docs/probe-demo.gif)
-
-The gif is a re-render of one real run's output (OpenCode on its free model), not a live recording.
 
 Each probe is one real model call on your account. Cursor's `--model` flag saves that model as your default; the probe puts your config back after. macOS ships neither `timeout` nor `gtimeout`, so install them with `brew install coreutils` first (the probe exits 4 without one).
 
