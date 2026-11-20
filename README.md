@@ -128,7 +128,7 @@ Each probe is one real model call on your account. Cursor's `--model` flag saves
 
 ## keeping it current
 
-A weekly Action re-checks every cited issue and pinned source line. When one moves, it opens a draft PR that refreshes the baseline and lists what moved, so the matching rows get a look before the merge. `make watch` runs the same check locally. If your harness changed, the [issue template](.github/ISSUE_TEMPLATE/harness-changed.md) asks for the version and a probe log, and [CONTRIBUTING](CONTRIBUTING.md) shows how to send the fixed row as a PR.
+A weekly Action re-checks every cited issue and pinned source line. When one moves, it files a "matrix sources moved" issue that lists what moved, so the matching rows get a look. (It tries a draft PR that refreshes the baseline first, but this repo doesn't let Actions open PRs, so the issue is what you'll see.) `make watch` runs the same check locally. If your harness changed, the [issue template](.github/ISSUE_TEMPLATE/harness-changed.md) asks for the version and a probe log, and [CONTRIBUTING](CONTRIBUTING.md) shows how to send the fixed row as a PR.
 
 ## development
 
